@@ -18,7 +18,7 @@ public class LoginWindow {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void _main() {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e1) {
@@ -77,6 +77,7 @@ public class LoginWindow {
 		frame.getContentPane().add(btnNewButton);
 		
 		JButton btnLogin = new JButton("LOGIN");
+		btnLogin.setEnabled(false);
 		springLayout.putConstraint(SpringLayout.EAST, textField, -6, SpringLayout.WEST, btnLogin);
 		springLayout.putConstraint(SpringLayout.SOUTH, btnLogin, 0, SpringLayout.SOUTH, btnNewButton);
 		springLayout.putConstraint(SpringLayout.NORTH, btnLogin, 0, SpringLayout.NORTH, textField);
