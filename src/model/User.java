@@ -9,7 +9,9 @@ public class User {
 			"administrator", 
 			"guest", 
 			"user", 
-			"gm"
+			"gm", 
+			"message", 
+			"notification"
 	};
 	private String user;
 	private String ipAddress;

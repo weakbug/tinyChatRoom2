@@ -4,6 +4,10 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+
+import control.BackstageInterface;
+import control.WindowInterface;
+
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -11,7 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
-public class ServerWindow {
+public class ServerWindow implements WindowInterface {
 
 	private JFrame frmServer;
 	private JTable table;
@@ -19,11 +23,13 @@ public class ServerWindow {
 	private JTextField textField;
 	private JButton btnSend;
 	private JTextArea textArea;
+	private static ServerWindow window;
+	private BackstageInterface backstageInterface;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void _main() {
+	public static WindowInterface _main(final BackstageInterface bif) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e1) {
@@ -33,19 +39,21 @@ public class ServerWindow {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ServerWindow window = new ServerWindow();
+					window = new ServerWindow(bif);
 					window.frmServer.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		return window;
 	}
 
 	/**
 	 * Create the application.
 	 */
-	public ServerWindow() {
+	public ServerWindow(BackstageInterface bif) {
+		backstageInterface = bif;
 		initialize();
 	}
 
@@ -91,5 +99,11 @@ public class ServerWindow {
 		springLayout.putConstraint(SpringLayout.EAST, textField, -6, SpringLayout.WEST, btnSend);
 		springLayout.putConstraint(SpringLayout.EAST, btnSend, 0, SpringLayout.EAST, scrollPane);
 		frmServer.getContentPane().add(btnSend);
+	}
+
+	@Override
+	public void echoMessage(String message) {
+		// TODO Auto-generated method stub
+		
 	}
 }

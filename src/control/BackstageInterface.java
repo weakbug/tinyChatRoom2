@@ -6,4 +6,8 @@ package control;
  */
 public interface BackstageInterface {
 	public void returnChoose(int whichWindow);
+	public boolean loginRequest(String nickname);
+	public void loadChatWindow();
+	public String scanServer();
+	public void sendMessage(String message);
 }

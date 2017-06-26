@@ -57,7 +57,7 @@ public class Choose {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 220, 82);
+		frame.setBounds(100, 100, 223, 96);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		frame.getContentPane().setLayout(springLayout);
@@ -77,15 +77,17 @@ public class Choose {
 		};
 		
 		btnServer = new JButton("Server");
+		springLayout.putConstraint(SpringLayout.NORTH, btnServer, 10, SpringLayout.NORTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, btnServer, -10, SpringLayout.EAST, frame.getContentPane());
 		btnServer.addActionListener(actionListener);
-		springLayout.putConstraint(SpringLayout.WEST, btnServer, 10, SpringLayout.WEST, frame.getContentPane());
 		frame.getContentPane().add(btnServer);
 		
 		btnClient = new JButton("Client");
-		btnClient.addActionListener(actionListener);
 		springLayout.putConstraint(SpringLayout.NORTH, btnClient, 10, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.NORTH, btnServer, 0, SpringLayout.NORTH, btnClient);
-		springLayout.putConstraint(SpringLayout.EAST, btnClient, -10, SpringLayout.EAST, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.SOUTH, btnClient, -10, SpringLayout.SOUTH, frame.getContentPane());
+		springLayout.putConstraint(SpringLayout.SOUTH, btnServer, 0, SpringLayout.SOUTH, btnClient);
+		springLayout.putConstraint(SpringLayout.WEST, btnClient, 10, SpringLayout.WEST, frame.getContentPane());
+		btnClient.addActionListener(actionListener);
 		frame.getContentPane().add(btnClient);
 	}
 	

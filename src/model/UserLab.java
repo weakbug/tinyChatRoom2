@@ -1,5 +1,8 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 单例模式，用户操作类
  * @author Shinrai
@@ -7,8 +10,10 @@ package model;
  */
 public class UserLab {
 	private static UserLab userLab;
+	private List<User> userList;
 	
 	private UserLab() {
+		userList = new ArrayList<User>();
 	}
 	public static synchronized UserLab getUserLab() {
 		if(userLab == null) {
@@ -16,4 +21,5 @@ public class UserLab {
 		}
 		return userLab;
 	}
+	
 }

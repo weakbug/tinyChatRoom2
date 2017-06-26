@@ -4,21 +4,32 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+
+import control.BackstageInterface;
+
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class LoginWindow {
 
-	private JFrame frame;
-	private JTextField textField;
+	private JFrame frmLogin;
+	private JTextField nicknameTextField;
+	private JButton btnLogin;
+	private JButton btnNewButton;
+	private String serverAddress;
+	private JLabel lblServerScaning;
+	private BackstageInterface backstageInterface;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void _main() {
+	public static void _main(final BackstageInterface bif) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e1) {
@@ -28,8 +39,8 @@ public class LoginWindow {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					LoginWindow window = new LoginWindow();
-					window.frame.setVisible(true);
+					LoginWindow window = new LoginWindow(bif);
+					window.frmLogin.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -40,7 +51,8 @@ public class LoginWindow {
 	/**
 	 * Create the application.
 	 */
-	public LoginWindow() {
+	public LoginWindow(BackstageInterface bif) {
+		backstageInterface = bif;
 		initialize();
 	}
 
@@ -48,40 +60,84 @@ public class LoginWindow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 280, 120);
-		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmLogin = new JFrame();
+		frmLogin.setTitle("Login");
+		frmLogin.setBounds(100, 100, 280, 120);
+		frmLogin.setResizable(false);
+		frmLogin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
-		frame.getContentPane().setLayout(springLayout);
+		frmLogin.getContentPane().setLayout(springLayout);
 		
 		JLabel lblUser = new JLabel("Nickname");
-		springLayout.putConstraint(SpringLayout.NORTH, lblUser, 16, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, lblUser, 10, SpringLayout.WEST, frame.getContentPane());
-		frame.getContentPane().add(lblUser);
+		springLayout.putConstraint(SpringLayout.NORTH, lblUser, 16, SpringLayout.NORTH, frmLogin.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, lblUser, 10, SpringLayout.WEST, frmLogin.getContentPane());
+		frmLogin.getContentPane().add(lblUser);
 		
-		textField = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, textField, 13, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, textField, 6, SpringLayout.EAST, lblUser);
-		frame.getContentPane().add(textField);
-		textField.setColumns(10);
+		nicknameTextField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, nicknameTextField, 13, SpringLayout.NORTH, frmLogin.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, nicknameTextField, 6, SpringLayout.EAST, lblUser);
+		frmLogin.getContentPane().add(nicknameTextField);
+		nicknameTextField.setColumns(10);
 		
-		JLabel lblServerScaning = new JLabel("Server scaning..");
-		springLayout.putConstraint(SpringLayout.WEST, lblServerScaning, 10, SpringLayout.WEST, frame.getContentPane());
-		frame.getContentPane().add(lblServerScaning);
+		lblServerScaning = new JLabel("");
+		springLayout.putConstraint(SpringLayout.WEST, lblServerScaning, 10, SpringLayout.WEST, frmLogin.getContentPane());
+		frmLogin.getContentPane().add(lblServerScaning);
 		
-		JButton btnNewButton = new JButton("Scan");
+		btnNewButton = new JButton("Scan");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lblServerScaning.setText("Server scaning..");
+				btnNewButton.setEnabled(false);
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						String serverAddr = backstageInterface.scanServer();
+						if(serverAddr == null) {
+							btnLogin.setEnabled(false);
+							lblServerScaning.setText("Server no found.");
+						}
+						else {
+							serverAddress = serverAddr;
+							btnLogin.setEnabled(true);
+							lblServerScaning.setText("Server: " + serverAddress);
+						}
+						btnNewButton.setEnabled(true);
+					}
+				}).start();
+			}
+		});
 		springLayout.putConstraint(SpringLayout.NORTH, lblServerScaning, 4, SpringLayout.NORTH, btnNewButton);
-		springLayout.putConstraint(SpringLayout.SOUTH, btnNewButton, -10, SpringLayout.SOUTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, btnNewButton, 0, SpringLayout.EAST, textField);
-		frame.getContentPane().add(btnNewButton);
+		springLayout.putConstraint(SpringLayout.SOUTH, btnNewButton, -10, SpringLayout.SOUTH, frmLogin.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, btnNewButton, 0, SpringLayout.EAST, nicknameTextField);
+		frmLogin.getContentPane().add(btnNewButton);
 		
-		JButton btnLogin = new JButton("LOGIN");
+		btnLogin = new JButton("LOGIN");
 		btnLogin.setEnabled(false);
-		springLayout.putConstraint(SpringLayout.EAST, textField, -6, SpringLayout.WEST, btnLogin);
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnLogin.setEnabled(false);
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						boolean rs = backstageInterface.loginRequest(nicknameTextField.getText());
+						if(rs == false) {
+							JOptionPane.showMessageDialog(null, "êÇ³Æ·Ç·¨»òêÇ³ÆÒÑ´æÔÚ¡£", "µÇÂ¼Ê§°Ü", JOptionPane.ERROR_MESSAGE);
+						}
+						else {
+							backstageInterface.loadChatWindow();
+							frmLogin.dispose();
+						}
+						btnLogin.setEnabled(true);
+					}
+				}).start();
+			}
+		});
+		springLayout.putConstraint(SpringLayout.EAST, nicknameTextField, -6, SpringLayout.WEST, btnLogin);
 		springLayout.putConstraint(SpringLayout.SOUTH, btnLogin, 0, SpringLayout.SOUTH, btnNewButton);
-		springLayout.putConstraint(SpringLayout.NORTH, btnLogin, 0, SpringLayout.NORTH, textField);
-		springLayout.putConstraint(SpringLayout.EAST, btnLogin, -10, SpringLayout.EAST, frame.getContentPane());
-		frame.getContentPane().add(btnLogin);
+		springLayout.putConstraint(SpringLayout.NORTH, btnLogin, 0, SpringLayout.NORTH, nicknameTextField);
+		springLayout.putConstraint(SpringLayout.EAST, btnLogin, -10, SpringLayout.EAST, frmLogin.getContentPane());
+		frmLogin.getContentPane().add(btnLogin);
 	}
 }
