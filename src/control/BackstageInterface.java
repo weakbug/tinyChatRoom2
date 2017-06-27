@@ -1,4 +1,7 @@
 package control;
+
+import model.User;
+
 /**
  * 后台接口类
  * @author Shinrai
@@ -10,4 +13,5 @@ public interface BackstageInterface {
 	public void loadChatWindow(String nickname);
 	public String scanServer();
 	public void sendMessage(String message);
+	public User getSelf();
 }

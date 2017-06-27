@@ -39,12 +39,11 @@ public class ChatWindow implements WindowInterface {
 	private JTextArea inputTextArea;
 	private JTextPane dialogueTextPane;
 	private JButton btnSend;
-	private String nickname;
 
 	/**
 	 * Launch the application.
 	 */
-	public static WindowInterface _main(final String nk, final BackstageInterface bif) {
+	public static WindowInterface _main(final BackstageInterface bif) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e1) {
@@ -54,7 +53,7 @@ public class ChatWindow implements WindowInterface {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					window = new ChatWindow(nk, bif);
+					window = new ChatWindow(bif);
 					window.frmChatroom.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -67,8 +66,7 @@ public class ChatWindow implements WindowInterface {
 	/**
 	 * Create the application.
 	 */
-	public ChatWindow(String nk, BackstageInterface bif) {
-		this.nickname = nk;
+	public ChatWindow(BackstageInterface bif) {
 		backstageInterface = bif;
 		initialize();
 	}
@@ -109,10 +107,10 @@ public class ChatWindow implements WindowInterface {
 		btnSend.setEnabled(false);
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String userString = UserLab.getUserLab().getUser(nickname).toString();
+				String userString = backstageInterface.getSelf().toString();
 				String appendText = HtmlUtil.formatText2HTML(userString, inputTextArea.getText());
 				dialogueTextPane.setText(HtmlUtil.append(dialogueTextPane.getText(), appendText));
-				System.out.println(dialogueTextPane.getText());
+//				System.out.println(dialogueTextPane.getText());
 				dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
@@ -122,6 +120,7 @@ public class ChatWindow implements WindowInterface {
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane_2, -6, SpringLayout.WEST, btnSend);
 		
 		inputTextArea = new JTextArea();
+		inputTextArea.setWrapStyleWord(true);
 		inputTextArea.setLineWrap(true);
 		scrollPane_2.setViewportView(inputTextArea);
 		inputTextArea.addKeyListener(new KeyListener() {
@@ -179,6 +178,7 @@ public class ChatWindow implements WindowInterface {
 		springLayout.putConstraint(SpringLayout.EAST, btnSend, 0, SpringLayout.EAST, scrollPane_1);
 		
 		dialogueTextPane = new JTextPane();
+		dialogueTextPane.setEditable(false);
 		/*
 		 * JTextPane HTML word wrap. get source code from:
 		 * https://stackoverflow.com/questions/7811666/enabling-word-wrap-in-a-jtextpane-with-htmldocument
@@ -234,8 +234,9 @@ public class ChatWindow implements WindowInterface {
 	        }); 
 		dialogueTextPane.setContentType("text/html");
 		scrollPane_1.setViewportView(dialogueTextPane);
-		dialogueTextPane.setText("<html><style type=\"text/css\">    ul{ margin: 4px; list-style-type:none; }</style><body><ul><font color=\"#009900\">shinrai(0.0.0.0:1234):</font><li>关于计网的实验报告和课设</li><li>1、要交的有：①实验报告；②打印版课设任务书和课设报告、电子版任务书和课设报告、程序源码</li><li>2、7月5日23：00前交给我（老学委)_）</li><li>3、消息群里有具体要求和模板（实验和课设的都有）</li><li>4、另外，请需要申请答辩的同学在7月5日前跟我报名</li></ul><ul><font color=\"#009900\">shinrai(0.0.0.0:1234):</font><li>关于计网的实验报告和课设</li><li>1、要交的有：①实验报告；②打印版课设任务书和课设报告、电子版任务书和课设报告、程序源码</li><li>2、7月5日23：00前交给我（老学委)_）</li><li>3、消息群里有具体要求和模板（实验和课设的都有）</li><li>4、另外，请需要申请答辩的同学在7月5日前跟我报名</li></ul></body></html>");
+		dialogueTextPane.setText(HtmlUtil.welcome(HtmlUtil.getBase() , backstageInterface.getSelf().getNickname() ) );
 		frmChatroom.getContentPane().add(btnSend);
+		
 	}
 
 	@Override

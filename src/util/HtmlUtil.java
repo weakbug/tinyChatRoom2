@@ -29,8 +29,15 @@ public class HtmlUtil {
 	 * @return 追加了新的内容的HTML文本。
 	 */
 	public static String append(String originHTML, String newContent) {
-		
-		return null;
+		String newEnd = newContent + "</body></html>";
+		String newHTML = originHTML.replaceFirst("<\\/body>[\\s\\S]*<\\/html>", newEnd);
+		return newHTML;
 	}
-
+	public static String getBase() {
+		return "<html><style type=\"text/css\"> ul{ margin: 4px; list-style-type:none; } div{ text-align:center; }</style><body></body></html>";
+	}
+	public static String welcome(String originHTML, String nickname) {
+		String s = "<div><font color=\"#880000\">欢迎 " + nickname + " 进入本聊天室。</font></div>";
+		return append(originHTML, s);
+	}
 }

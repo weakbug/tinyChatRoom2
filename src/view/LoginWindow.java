@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import control.BackstageInterface;
 
@@ -14,6 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 
 public class LoginWindow {
@@ -74,6 +78,56 @@ public class LoginWindow {
 		frmLogin.getContentPane().add(lblUser);
 		
 		nicknameTextField = new JTextField();
+		nicknameTextField.getDocument().addDocumentListener(new DocumentListener() {
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				if(!nicknameTextField.getText().equals("") && serverAddress != null) {
+					btnLogin.setEnabled(true);
+				}
+				else {
+					btnLogin.setEnabled(false);
+				}
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				if(serverAddress != null) {
+					btnLogin.setEnabled(true);
+				}
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		nicknameTextField.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+					e.consume();
+					btnLogin.doClick();
+				}
+			}
+		});
 		springLayout.putConstraint(SpringLayout.NORTH, nicknameTextField, 13, SpringLayout.NORTH, frmLogin.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, nicknameTextField, 6, SpringLayout.EAST, lblUser);
 		frmLogin.getContentPane().add(nicknameTextField);
@@ -93,13 +147,15 @@ public class LoginWindow {
 					public void run() {
 						// TODO Auto-generated method stub
 						String serverAddr = backstageInterface.scanServer();
+						serverAddress = serverAddr;
 						if(serverAddr == null) {
 							btnLogin.setEnabled(false);
 							lblServerScaning.setText("Server no found.");
 						}
 						else {
-							serverAddress = serverAddr;
-							btnLogin.setEnabled(true);
+							if(!nicknameTextField.getText().equals("")) {
+								btnLogin.setEnabled(true);
+							}
 							lblServerScaning.setText("Server: " + serverAddress);
 						}
 						btnNewButton.setEnabled(true);
@@ -111,6 +167,7 @@ public class LoginWindow {
 		springLayout.putConstraint(SpringLayout.SOUTH, btnNewButton, -10, SpringLayout.SOUTH, frmLogin.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, btnNewButton, 0, SpringLayout.EAST, nicknameTextField);
 		frmLogin.getContentPane().add(btnNewButton);
+		btnNewButton.doClick();
 		
 		btnLogin = new JButton("LOGIN");
 		btnLogin.setEnabled(false);

@@ -2,7 +2,12 @@ package control;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 
+import model.User;
+import util.NetworkUtil;
 import view.*;
 
 public class Backstage implements BackstageInterface {
@@ -10,6 +15,7 @@ public class Backstage implements BackstageInterface {
 	private static Backstage backstage;
 	private WindowInterface serverWindow;
 	private WindowInterface chatWindow;
+	private User self;
 	
 	public static void main(String[] args) {
 		backstage = new Backstage();
@@ -65,11 +71,24 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public void loadChatWindow(String nickname) {
 		// TODO Auto-generated method stub
-		chatWindow = ChatWindow._main(nickname, this);
+		String ipAddress = null;
+		try {
+			ipAddress = NetworkUtil.getLocalHostLANAddress().getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		self = new User(nickname, ipAddress, 1234, null);
+		chatWindow = ChatWindow._main(this);
 	}
 	@Override
 	public void sendMessage(String message) {
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public User getSelf() {
+		// TODO Auto-generated method stub
+		return self;
 	}
 }
