@@ -4,13 +4,32 @@ import java.awt.Color;
 
 public class HtmlUtil {
 	/**
-	 * 用于
-	 * @param originH 原本的html文本，指从textpane直接获取出来的文本。
-	 * @param additionS 追加的文字。
-	 * @param isPrivate 是否是私聊。
-	 * @return 解析合并处理后的html文本。
+	 * 把原始文本格式化为HTML文本。
+	 * @param info 昵称、ip和端口号的文本。
+	 * @param origin 原始文本。
+	 * @return 处理后的HTML文本。
 	 */
-	public static String addNewDialogue(String originH, String additionS, boolean isPrivate) {
+	public static String formatText2HTML(String info, String origin) {
+		String[] res = origin.split("\n");
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("<ul>");
+		stringBuilder.append("<font color=\"#008800\">");
+		stringBuilder.append(info);
+		stringBuilder.append(":</font>");
+		for(String s : res) {
+			stringBuilder.append("<li>");
+			stringBuilder.append(s);
+			stringBuilder.append("</li>");
+		}
+		return stringBuilder.toString();
+	}
+	/**
+	 * 把新的内容追加到原HTML中。
+	 * @param newContent
+	 * @return 追加了新的内容的HTML文本。
+	 */
+	public static String append(String originHTML, String newContent) {
+		
 		return null;
 	}
 

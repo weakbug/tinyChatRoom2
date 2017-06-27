@@ -121,12 +121,13 @@ public class LoginWindow {
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						boolean rs = backstageInterface.loginRequest(nicknameTextField.getText());
+						String nickname = nicknameTextField.getText();
+						boolean rs = backstageInterface.loginRequest(nickname);
 						if(rs == false) {
 							JOptionPane.showMessageDialog(null, "昵称非法或昵称已存在。", "登录失败", JOptionPane.ERROR_MESSAGE);
 						}
 						else {
-							backstageInterface.loadChatWindow();
+							backstageInterface.loadChatWindow(nickname);
 							frmLogin.dispose();
 						}
 						btnLogin.setEnabled(true);

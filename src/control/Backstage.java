@@ -63,9 +63,9 @@ public class Backstage implements BackstageInterface {
 		return "0.0.0.0";
 	}
 	@Override
-	public void loadChatWindow() {
+	public void loadChatWindow(String nickname) {
 		// TODO Auto-generated method stub
-		chatWindow = ChatWindow._main(this);
+		chatWindow = ChatWindow._main(nickname, this);
 	}
 	@Override
 	public void sendMessage(String message) {
