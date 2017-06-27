@@ -7,7 +7,7 @@ import java.awt.Color;
  * @since 2017-6-26 14:16:09
  */
 public class User {
-	public static final String banNickname = "^(?:admin|administrator|guest|user|gm|error)$";
+	public static final String banNickname = "^(?i)(?:admin|administrator|guest|user|gm|error)$";
 	private String nickname;
 	private String ipAddress;
 	private int port;
