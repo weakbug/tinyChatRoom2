@@ -40,7 +40,7 @@ public class Backstage implements BackstageInterface {
 	public boolean loginRequest(String nickname) {
 		// TODO Auto-generated method stub
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(500);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -55,12 +55,12 @@ public class Backstage implements BackstageInterface {
 	public String scanServer() {
 		// TODO Auto-generated method stub
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(500);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return "";
+		return "0.0.0.0";
 	}
 	@Override
 	public void loadChatWindow() {
