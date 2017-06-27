@@ -39,6 +39,7 @@ public class ChatWindow implements WindowInterface {
 	private JTextArea inputTextArea;
 	private JTextPane dialogueTextPane;
 	private JButton btnSend;
+	private String publicChatRecord;
 
 	/**
 	 * Launch the application.
@@ -109,8 +110,9 @@ public class ChatWindow implements WindowInterface {
 			public void actionPerformed(ActionEvent e) {
 				String userString = backstageInterface.getSelf().toString();
 				String appendText = HtmlUtil.formatText2HTML(userString, inputTextArea.getText());
-				dialogueTextPane.setText(HtmlUtil.append(dialogueTextPane.getText(), appendText));
-//				System.out.println(dialogueTextPane.getText());
+				String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
+				dialogueTextPane.setText(allText);
+				setChatRecord(allText);
 				dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
@@ -234,9 +236,10 @@ public class ChatWindow implements WindowInterface {
 	        }); 
 		dialogueTextPane.setContentType("text/html");
 		scrollPane_1.setViewportView(dialogueTextPane);
-		dialogueTextPane.setText(HtmlUtil.welcome(HtmlUtil.getBase() , backstageInterface.getSelf().getNickname() ) );
+		String html = HtmlUtil.welcome(HtmlUtil.getBase() , backstageInterface.getSelf().getNickname());
+		dialogueTextPane.setText(html);
+		setChatRecord(html);
 		frmChatroom.getContentPane().add(btnSend);
-		
 	}
 
 	@Override
@@ -245,4 +248,10 @@ public class ChatWindow implements WindowInterface {
 		
 	}
 
+	private String getChatRecord() {
+		return publicChatRecord;
+	}
+	private void setChatRecord(String chatRecord) {
+		publicChatRecord = chatRecord;
+	}
 }

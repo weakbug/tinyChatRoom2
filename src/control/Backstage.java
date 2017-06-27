@@ -46,7 +46,7 @@ public class Backstage implements BackstageInterface {
 	public boolean loginRequest(String nickname) {
 		// TODO Auto-generated method stub
 		if(nickname.matches(User.banNickname)) {
-			System.out.println("banNickname : " + nickname);
+//			System.out.println("banNickname : " + nickname);
 			return false;
 		}
 		try {

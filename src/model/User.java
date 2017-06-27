@@ -12,6 +12,7 @@ public class User {
 	private String ipAddress;
 	private int port;
 	private String publicKey;
+	private String chatRecord;
 	
 	public User(String nickname, String ipAddress, int port, String publicKey) {
 		this.nickname = nickname;
