@@ -7,16 +7,7 @@ import java.awt.Color;
  * @since 2017-6-26 14:16:09
  */
 public class User {
-	public static final String[] banNickname = {
-			"admin",
-			"administrator", 
-			"guest", 
-			"user", 
-			"gm", 
-			"message", 
-			"notification", 
-			"error"
-	};
+	public static final String banNickname = "^(?:admin|administrator|guest|user|gm|error)$";
 	private String nickname;
 	private String ipAddress;
 	private int port;
@@ -32,13 +23,6 @@ public class User {
 	public boolean equals(Object anObject) {
 		if(this == anObject) {
 			return true;
-		}
-		if(anObject instanceof String) {
-			String s = (String)anObject;
-			if(this.nickname.equals(s)) {
-				return true;
-			}
-			return false;
 		}
 		if(anObject instanceof User) {
 			User user = (User)anObject;
@@ -63,5 +47,12 @@ public class User {
 	
 	public String getNickname() {
 		return nickname;
+	}
+	/**
+	 * 用作比较
+	 * @return 临时用户。
+	 */
+	public static User getTempUser(String nickname) {
+		return new User(nickname, null, -1, null);
 	}
 }

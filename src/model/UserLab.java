@@ -22,10 +22,10 @@ public class UserLab {
 		return userLab;
 	}
 	public User getUser(String nickname) {
-		int index = userList.indexOf(nickname);
+		int index = userList.indexOf(User.getTempUser(nickname));
 		if(index != -1) {
 			return userList.get(index);
 		}
-		return new User("error", "0,0,0,0", 8088, null);
+		return new User("error", "0.0.0.0", 88, null);//³ö´í±£»¤
 	}
 }

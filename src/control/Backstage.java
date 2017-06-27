@@ -45,6 +45,9 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public boolean loginRequest(String nickname) {
 		// TODO Auto-generated method stub
+		if(nickname.matches(User.banNickname)) {
+			return false;
+		}
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
