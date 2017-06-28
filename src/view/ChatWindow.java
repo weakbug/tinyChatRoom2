@@ -116,7 +116,7 @@ public class ChatWindow implements WindowInterface {
 				dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
-				backstageInterface.sendMessage(appendText);
+				backstageInterface.sendTcpMessage(appendText);
 			}
 		});
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane_2, -6, SpringLayout.WEST, btnSend);

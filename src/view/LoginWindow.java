@@ -66,7 +66,7 @@ public class LoginWindow {
 	private void initialize() {
 		frmLogin = new JFrame();
 		frmLogin.setTitle("Login");
-		frmLogin.setBounds(100, 100, 280, 120);
+		frmLogin.setBounds(100, 100, 320, 120);
 		frmLogin.setResizable(false);
 		frmLogin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();

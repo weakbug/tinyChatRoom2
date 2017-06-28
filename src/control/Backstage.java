@@ -5,6 +5,12 @@ import java.awt.event.ActionListener;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import model.User;
 import util.NetworkUtil;
@@ -20,6 +26,7 @@ public class Backstage implements BackstageInterface {
 	private User self;
 	private UdpUtil udpUtil;
 	private TcpUtil tcpUtil;
+	private String serverAddressAndPort = null;
 	
 	public static void main(String[] args) {
 		backstage = new Backstage();
@@ -27,7 +34,7 @@ public class Backstage implements BackstageInterface {
 	}
 	private Backstage() {
 		udpUtil = new UdpUtil(this);
-		TcpUtil = new TcpUtil(this);
+//		TcpUtil = new TcpUtil(this);
 	}
 
 	/**
@@ -54,7 +61,6 @@ public class Backstage implements BackstageInterface {
 	public boolean loginRequest(String nickname) {
 		// TODO Auto-generated method stub
 		if(nickname.matches(User.banNickname)) {
-//			System.out.println("banNickname : " + nickname);
 			return false;
 		}
 		try {
@@ -63,22 +69,43 @@ public class Backstage implements BackstageInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return true;
+		return false;
 	}
 	/**
 	 * LoginWindow 窗口调用
-	 * @return 返回扫描到的服务器地址。null为服务器响应。
+	 * @return 返回扫描到的服务器地址:端口。
 	 */
 	@Override
 	public String scanServer() {
 		// TODO Auto-generated method stub
+		serverAddressAndPort = null;
+		sendUdpMessage("unfinished");
+		final ExecutorService exec = Executors.newFixedThreadPool(1);
+		Callable<String> call = new Callable<String>() {
+			@Override
+			public String call() throws Exception {
+				// TODO Auto-generated method stub
+				while(true) {
+					if(serverAddressAndPort != null) {
+						Thread.sleep(200);
+						return serverAddressAndPort;
+					}
+				}
+			}
+		};
 		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "0.0.0.0";
+			Future<String> future = exec.submit(call);
+			serverAddressAndPort = future.get(1000 * 3, TimeUnit.MILLISECONDS);
+		} catch (TimeoutException ex) {
+			serverAddressAndPort = null;
+            System.out.println("处理超时啦....");  
+//            ex.printStackTrace();  
+        } catch (Exception e) {
+        	serverAddressAndPort = null;
+            System.out.println("处理失败.");  
+//            e.printStackTrace();  
+        }
+		return serverAddressAndPort;
 	}
 	@Override
 	public void loadChatWindow(String nickname) {
@@ -94,11 +121,6 @@ public class Backstage implements BackstageInterface {
 		chatWindow = ChatWindow._main(this);
 	}
 	@Override
-	public void sendMessage(String message) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
 	public User getSelf() {
 		// TODO Auto-generated method stub
 		return self;
@@ -110,6 +132,21 @@ public class Backstage implements BackstageInterface {
 	}
 	@Override
 	public void tcpCallBack(String receiveString) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void sendUdpMessage(String message) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void sendTcpMessage(String message) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void sendTdpMessagePrivate(String message, String nickname) {
 		// TODO Auto-generated method stub
 		
 	}
