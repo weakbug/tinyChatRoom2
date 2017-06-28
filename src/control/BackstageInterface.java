@@ -14,4 +14,6 @@ public interface BackstageInterface {
 	public String scanServer();
 	public void sendMessage(String message);
 	public User getSelf();
+	public void udpCallBack(String receiveString);
+	public void tcpCallBack(String receiveString);
 }

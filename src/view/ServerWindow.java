@@ -86,7 +86,10 @@ public class ServerWindow implements WindowInterface {
         dataVec = new Vector<Vector<String>>(); 
 		table = new JTable(dataVec, colHeader);
 		scrollPane.setViewportView(table);
-		addUser2Table(new User("shinrai", "0.0.0.0", 81, "xxxxxx"));//test;
+		/* test */
+//		addUser2Table(new User("shinrai", "0.0.0.0", 81, "xxxxxx"));
+//		addUser2Table(new User("shinrai2", "0.0.0.0", 81, "xxxxxx"));
+//		deleteUserFromTable("shinrai");
 		
 		scrollPane_1 = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPane_1, 6, SpringLayout.SOUTH, scrollPane);
@@ -123,5 +126,13 @@ public class ServerWindow implements WindowInterface {
 		newLine.add(String.valueOf(user.getPort()));
 		newLine.add(user.getPublicKey());
 		dataVec.add(newLine);
+	}
+	private void deleteUserFromTable(String nickname) {
+		for (int i = 0;i < dataVec.size(); i++) {
+			Vector<String> data = dataVec.get(i);
+			if(data.get(0).equals(nickname)) {
+				dataVec.remove(data);
+			}
+		}
 	}
 }
