@@ -79,7 +79,11 @@ public class Backstage implements BackstageInterface {
 	public String scanServer() {
 		// TODO Auto-generated method stub
 		serverAddressAndPort = null;
-		sendUdpMessage("unfinished");
+		sendUdpMessage("\\/\\/\\/\\/\\/\\/unfinished");
+		/**
+		 * 超时控制代码，取自下面网站
+		 * http://blog.csdn.net/xmlrequest/article/details/8992029
+		 */
 		final ExecutorService exec = Executors.newFixedThreadPool(1);
 		Callable<String> call = new Callable<String>() {
 			@Override
@@ -87,7 +91,7 @@ public class Backstage implements BackstageInterface {
 				// TODO Auto-generated method stub
 				while(true) {
 					if(serverAddressAndPort != null) {
-						Thread.sleep(200);
+						Thread.sleep(300);//降低循环频率
 						return serverAddressAndPort;
 					}
 				}
@@ -95,14 +99,14 @@ public class Backstage implements BackstageInterface {
 		};
 		try {
 			Future<String> future = exec.submit(call);
-			serverAddressAndPort = future.get(1000 * 3, TimeUnit.MILLISECONDS);
+			serverAddressAndPort = future.get(1000 * 4, TimeUnit.MILLISECONDS);
 		} catch (TimeoutException ex) {
 			serverAddressAndPort = null;
-            System.out.println("处理超时啦....");  
+            System.out.println("获取服务器地址和端口号超时啦....");
 //            ex.printStackTrace();  
         } catch (Exception e) {
         	serverAddressAndPort = null;
-            System.out.println("处理失败.");  
+            System.out.println("获取失败.(未知原因)");
 //            e.printStackTrace();  
         }
 		return serverAddressAndPort;
@@ -128,7 +132,10 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public void udpCallBack(String receiveString) {
 		// TODO Auto-generated method stub
-		
+		/* 其实udp接收的信息只有两种，
+		 * 分别是 '服务器接收客户端的获取请求' 和 '客户端接收服务器的反馈' ，
+		 * 所以只需要一个很简单的文本分割or正则匹配就OK。 */
+		//unfinished..
 	}
 	@Override
 	public void tcpCallBack(String receiveString) {
