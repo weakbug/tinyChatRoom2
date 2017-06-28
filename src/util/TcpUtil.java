@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,17 +82,18 @@ public class TcpUtil {
 	 * 
 	 * @param msg 需要发送的消息
 	 */
-	public void sendMessage(final String msg) {
+	public void sendMessage(final String msg) {		
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
+				PrintWriter writer = null;
 				// TODO Auto-generated method stub
 				for(SocketInfo si : socketinfolist) {
 					Socket s = si.getSocket();
 					try {
-						OutputStream out = s.getOutputStream();
-						out.write(msg.getBytes());
-						out.close();
+						writer = new PrintWriter(s.getOutputStream());
+						writer.println(msg);
+						writer.flush();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -100,18 +102,25 @@ public class TcpUtil {
 			}
 		}).start();
 	}
-	private void exec(Socket socket) {//接收信息，回调
-		try {
-	    	InputStream in=socket.getInputStream();
-	    	byte[] buf = new byte[1024];
-	    	int len = in.read(buf);
-	    	String text = new String(buf,0,len);
-	    	System.out.println("text received : "+text);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+	private void exec(final Socket socket) {//接收信息，回调
+		new Thread(new Runnable(){
+			@Override
+			public void run(){
+				try{
+				BufferedReader reader = null;
+				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				while(true){
+					String message = reader.readLine();
+			    	System.out.println("text received : "+message);
+				}    	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+			}
+		}).start();	
 	}
+		
 	
 	public Socket searchSocket(String ipAddress,Integer port){
 		int index;
