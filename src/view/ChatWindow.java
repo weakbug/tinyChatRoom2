@@ -21,9 +21,11 @@ import util.HtmlUtil;
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SizeRequirements;
 import javax.swing.JList;
 import java.awt.event.ActionListener;
@@ -40,6 +42,7 @@ public class ChatWindow implements WindowInterface {
 	private JTextPane dialogueTextPane;
 	private JButton btnSend;
 	private String publicChatRecord;
+	private DefaultListModel listModel;
 
 	/**
 	 * Launch the application.
@@ -175,7 +178,10 @@ public class ChatWindow implements WindowInterface {
 		});
 		springLayout.putConstraint(SpringLayout.SOUTH, btnSend, 0, SpringLayout.SOUTH, scrollPane);
 		
-		JList list = new JList();
+		listModel = new DefaultListModel();
+		listModel.addElement("所有人");
+		JList list = new JList(listModel);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(list);
 		springLayout.putConstraint(SpringLayout.EAST, btnSend, 0, SpringLayout.EAST, scrollPane_1);
 		
@@ -253,5 +259,15 @@ public class ChatWindow implements WindowInterface {
 	}
 	private void setChatRecord(String chatRecord) {
 		publicChatRecord = chatRecord;
+	}
+	private void addToList(String str){
+		listModel.addElement(str);
+	}
+	private void deleteFromList(String str){
+		if(listModel.removeElement(str)){
+			return;
+		}else{
+			System.out.println("错误：没有"+str);
+		}
 	}
 }
