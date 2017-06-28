@@ -2,6 +2,8 @@ package model;
 
 import java.awt.Color;
 
+import util.HtmlUtil;
+
 /**
  * @author Shinrai
  * @since 2017-6-26 14:16:09
@@ -19,6 +21,7 @@ public class User {
 		this.ipAddress = ipAddress;
 		this.port = port;
 		this.publicKey = publicKey;
+		chatRecord = null;
 	}
 	@Override
 	public boolean equals(Object anObject) {
@@ -56,6 +59,15 @@ public class User {
 	}
 	public String getPublicKey() {
 		return publicKey;
+	}
+	public String getChatRecord() {
+		if(chatRecord == null) {
+			chatRecord = HtmlUtil.getBase();
+		}
+		return chatRecord;
+	}
+	public void setChatRecord(String chatRecord) {
+		this.chatRecord = chatRecord;
 	}
 	/**
 	 * 用作比较
