@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 
 import model.User;
 import util.NetworkUtil;
+import util.TcpUtil;
 import util.UdpUtil;
 import view.*;
 
@@ -18,12 +19,16 @@ public class Backstage implements BackstageInterface {
 	private WindowInterface chatWindow;
 	private User self;
 	private UdpUtil udpUtil;
+	private TcpUtil tcpUtil;
 	
 	public static void main(String[] args) {
 		backstage = new Backstage();
 		Choose._main(backstage);
 	}
-	private Backstage() {}
+	private Backstage() {
+		udpUtil = new UdpUtil(this);
+		TcpUtil = new TcpUtil(this);
+	}
 
 	/**
 	 * Choose ´°¿Úµ÷ÓÃ
@@ -37,7 +42,7 @@ public class Backstage implements BackstageInterface {
 		}
 		if(whichWindow == Choose.SERVER) {
 			serverWindow = ServerWindow._main(this);
-			udpUtil = new UdpUtil(this);
+			
 		}
 	}
 	/**
@@ -91,7 +96,7 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public void sendMessage(String message) {
 		// TODO Auto-generated method stub
-		UdpUtil.sendUdpPacket(message);
+		
 	}
 	@Override
 	public User getSelf() {

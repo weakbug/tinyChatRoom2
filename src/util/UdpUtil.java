@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
 
 import control.BackstageInterface;
 import model.*;
@@ -18,7 +17,7 @@ public class UdpUtil {
 	
 	/**
 	 * 实例初始化时传入接口实例
-	 * @param tcb BackstageInterface接口的实例
+	 * @param tcb ThreadCallBack接口的实例
 	 */
 	public UdpUtil(BackstageInterface bi) {
 		try {
@@ -55,6 +54,7 @@ public class UdpUtil {
 			            try {  
 			            	ds.receive(dp); //阻塞型监听
 			            	String msg = new String(buf, 0, dp.getLength());
+			            	/* 消息回调 */
 			            	backstageInterface.udpCallBack(msg);
 			            } catch (Exception e) {  
 			                e.printStackTrace();  
@@ -71,29 +71,19 @@ public class UdpUtil {
 	 * 发送Udp广播
 	 * @param msg 需要发送的字符串信息
 	 */
-	public static void sendUdpPacket(String msg) {
+	public void sendUdpPacket(String msg) {
 		byte[] data = msg.getBytes();
-		try {
-			final MulticastSocket ds2 = new MulticastSocket();
-			InetAddress addr = InetAddress.getByName(multicastHost);
-			final DatagramPacket dataPacket = new DatagramPacket(data, data.length, addr, 8004);
-			new Thread(new Runnable() {
-            	@Override
-            	public void run() {
-                	try {
-                    	ds2.send(dataPacket);
-                	} catch (IOException e) {
-                    	e.printStackTrace();
-                	}
-            	}
-        	}).start();
-		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}  
+		final DatagramPacket dataPacket = new DatagramPacket(data, data.length, address, 8004);
+		new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ds.send(dataPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 	}
 
 }
