@@ -27,10 +27,9 @@ public class User {
 		}
 		if(anObject instanceof User) {
 			User user = (User)anObject;
-			if(this.getNickname().equals(user.getNickname())) {
+			if(this.nickname.equals(user.nickname)) {
 				return true;
 			}
-			return false;
 		}
 		return false;
 	}
@@ -48,6 +47,15 @@ public class User {
 	
 	public String getNickname() {
 		return nickname;
+	}
+	public String getIpAddress() {
+		return ipAddress;
+	}
+	public int getPort() {
+		return port;
+	}
+	public String getPublicKey() {
+		return publicKey;
 	}
 	/**
 	 * 用作比较

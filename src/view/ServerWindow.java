@@ -1,12 +1,14 @@
 package view;
 
 import java.awt.EventQueue;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import control.BackstageInterface;
 import control.WindowInterface;
+import model.User;
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
@@ -25,6 +27,7 @@ public class ServerWindow implements WindowInterface {
 	private JTextArea textArea;
 	private static ServerWindow window;
 	private BackstageInterface backstageInterface;
+	private Vector<Vector<String>> dataVec;
 
 	/**
 	 * Launch the application.
@@ -75,8 +78,15 @@ public class ServerWindow implements WindowInterface {
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane, -10, SpringLayout.EAST, frmServer.getContentPane());
 		frmServer.getContentPane().add(scrollPane);
 		
-		table = new JTable();
+		Vector<String> colHeader = new Vector<String>(); 
+        colHeader.add("nickname"); 
+        colHeader.add("ip address"); 
+        colHeader.add("port"); 
+        colHeader.add("publicKey"); 
+        dataVec = new Vector<Vector<String>>(); 
+		table = new JTable(dataVec, colHeader);
 		scrollPane.setViewportView(table);
+		addUser2Table(new User("shinrai", "0.0.0.0", 81, "xxxxxx"));//test;
 		
 		scrollPane_1 = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPane_1, 6, SpringLayout.SOUTH, scrollPane);
@@ -105,5 +115,13 @@ public class ServerWindow implements WindowInterface {
 	public void echoMessage(String message) {
 		// TODO Auto-generated method stub
 		
+	}
+	private void addUser2Table(User user) {
+		Vector<String> newLine = new Vector<String>(); 
+		newLine.add(user.getNickname());
+		newLine.add(user.getIpAddress());
+		newLine.add(String.valueOf(user.getPort()));
+		newLine.add(user.getPublicKey());
+		dataVec.add(newLine);
 	}
 }
