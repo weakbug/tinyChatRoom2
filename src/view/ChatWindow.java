@@ -111,8 +111,7 @@ public class ChatWindow implements WindowInterface {
 		btnSend.setEnabled(false);
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String userString = backstageInterface.getSelf().toString();
-				String appendText = HtmlUtil.formatText2HTML(userString, inputTextArea.getText());
+				String appendText = HtmlUtil.formatText2HTML(null, inputTextArea.getText());
 				String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
 				dialogueTextPane.setText(allText);
 				setChatRecord(allText);
@@ -242,7 +241,7 @@ public class ChatWindow implements WindowInterface {
 	        }); 
 		dialogueTextPane.setContentType("text/html");
 		scrollPane_1.setViewportView(dialogueTextPane);
-		String html = HtmlUtil.welcome(HtmlUtil.getBase() , backstageInterface.getSelf().getNickname());
+		String html = HtmlUtil.welcome(HtmlUtil.getBase() , backstageInterface.getNickname());
 		dialogueTextPane.setText(html);
 		setChatRecord(html);
 		frmChatroom.getContentPane().add(btnSend);

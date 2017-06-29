@@ -11,11 +11,11 @@ public interface BackstageInterface {
 	public void returnChoose(int whichWindow);
 	public boolean loginRequest(String nickname);
 	public void loadChatWindow(String nickname);
-	public String scanServer();
+	public boolean scanServer();
 	public void sendUdpMessage(String message);
 	public void sendTcpMessage(String message);
 	public void sendTdpMessagePrivate(String message, String nickname);
-	public User getSelf();
 	public void udpCallBack(String receiveString);
 	public void tcpCallBack(String receiveString);
+	public String getNickname();
 }

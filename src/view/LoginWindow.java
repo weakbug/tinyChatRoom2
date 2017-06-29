@@ -26,7 +26,7 @@ public class LoginWindow {
 	private JTextField nicknameTextField;
 	private JButton btnLogin;
 	private JButton btnNewButton;
-	private String serverAddress;
+	private boolean isFindServer;
 	private JLabel lblServerScaning;
 	private BackstageInterface backstageInterface;
 
@@ -83,7 +83,7 @@ public class LoginWindow {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				// TODO Auto-generated method stub
-				if(!nicknameTextField.getText().equals("") && serverAddress != null) {
+				if(!nicknameTextField.getText().equals("") && isFindServer == true) {
 					btnLogin.setEnabled(true);
 				}
 				else {
@@ -94,7 +94,7 @@ public class LoginWindow {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				// TODO Auto-generated method stub
-				if(serverAddress != null) {
+				if(isFindServer == true) {
 					btnLogin.setEnabled(true);
 				}
 			}
@@ -146,9 +146,8 @@ public class LoginWindow {
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						String serverAddr = backstageInterface.scanServer();
-						serverAddress = serverAddr;
-						if(serverAddr == null) {
+						isFindServer = backstageInterface.scanServer();
+						if(!isFindServer) {
 							btnLogin.setEnabled(false);
 							lblServerScaning.setText("Server no found.");
 						}
@@ -156,7 +155,7 @@ public class LoginWindow {
 							if(!nicknameTextField.getText().equals("")) {
 								btnLogin.setEnabled(true);
 							}
-							lblServerScaning.setText("Server: " + serverAddress);
+							lblServerScaning.setText("Found.");
 						}
 						btnNewButton.setEnabled(true);
 					}

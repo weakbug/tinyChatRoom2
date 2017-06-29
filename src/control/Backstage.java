@@ -13,28 +13,38 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import model.User;
+import util.MessageConstructor;
+import util.MessageConstructor.Msg;
 import util.NetworkUtil;
 import util.TcpUtil;
 import util.UdpUtil;
 import view.*;
 
 public class Backstage implements BackstageInterface {
-	
+	private boolean isServerMode;
 	private static Backstage backstage;
 	private WindowInterface serverWindow;
 	private WindowInterface chatWindow;
-	private User self;
 	private UdpUtil udpUtil;
 	private TcpUtil tcpUtil;
-	private String serverAddressAndPort = null;
+	private String serverAddress;
+	private int serverPort;
+	private String nickname;
 	
 	public static void main(String[] args) {
 		backstage = new Backstage();
 		Choose._main(backstage);
 	}
 	private Backstage() {
+		try {
+			serverAddress = NetworkUtil.getLocalHostLANAddress().getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		serverPort = 7747;
+		//初始化socket(udp)部分
 		udpUtil = new UdpUtil(this);
-//		TcpUtil = new TcpUtil(this);
 	}
 
 	/**
@@ -45,9 +55,12 @@ public class Backstage implements BackstageInterface {
 	public void returnChoose(int whichWindow) {
 		// TODO Auto-generated method stub
 		if(whichWindow == Choose.CLIENT) {
+			isServerMode = false;
 			LoginWindow._main(this);
 		}
 		if(whichWindow == Choose.SERVER) {
+			isServerMode = true;
+			tcpUtil = TcpUtil.getTcpUtilOfServer(serverPort, this);
 			serverWindow = ServerWindow._main(this);
 			
 		}
@@ -63,23 +76,27 @@ public class Backstage implements BackstageInterface {
 		if(nickname.matches(User.banNickname)) {
 			return false;
 		}
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
+		this.nickname = nickname;
+		tcpUtil = TcpUtil.getTcpUtilOfClient(serverAddress, serverPort, this);
+		tcpUtil.sendMessage("test");
+//		try {
+//			Thread.sleep(500);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		return true;
 	}
 	/**
 	 * LoginWindow 窗口调用
 	 * @return 返回扫描到的服务器地址:端口。
 	 */
 	@Override
-	public String scanServer() {
+	public boolean scanServer() {
 		// TODO Auto-generated method stub
-		serverAddressAndPort = null;
-		sendUdpMessage("\\/\\/\\/\\/\\/\\/unfinished");
+//		serverAddressAndPort = null;
+		serverPort = -1;
+		sendUdpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.UDP.REQUEST_SERVER_ADDRESS_AND_PORT, ""));
 		/**
 		 * 超时控制代码，取自下面网站
 		 * http://blog.csdn.net/xmlrequest/article/details/8992029
@@ -90,44 +107,29 @@ public class Backstage implements BackstageInterface {
 			public String call() throws Exception {
 				// TODO Auto-generated method stub
 				while(true) {
-					if(serverAddressAndPort != null) {
+					if(serverPort != -1) {
 						Thread.sleep(300);//降低循环频率
-						return serverAddressAndPort;
+						return null;
 					}
 				}
 			}
 		};
 		try {
 			Future<String> future = exec.submit(call);
-			serverAddressAndPort = future.get(1000 * 4, TimeUnit.MILLISECONDS);
+			future.get(1000 * 4, TimeUnit.MILLISECONDS);
+			return true;
 		} catch (TimeoutException ex) {
-			serverAddressAndPort = null;
             System.out.println("获取服务器地址和端口号超时啦....");
-//            ex.printStackTrace();  
+            return false;
         } catch (Exception e) {
-        	serverAddressAndPort = null;
             System.out.println("获取失败.(未知原因)");
-//            e.printStackTrace();  
+            return false;
         }
-		return serverAddressAndPort;
 	}
 	@Override
 	public void loadChatWindow(String nickname) {
 		// TODO Auto-generated method stub
-		String ipAddress = null;
-		try {
-			ipAddress = NetworkUtil.getLocalHostLANAddress().getHostAddress();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		self = new User(nickname, ipAddress, 1234, null);
 		chatWindow = ChatWindow._main(this);
-	}
-	@Override
-	public User getSelf() {
-		// TODO Auto-generated method stub
-		return self;
 	}
 	@Override
 	public void udpCallBack(String receiveString) {
@@ -135,26 +137,42 @@ public class Backstage implements BackstageInterface {
 		/* 其实udp接收的信息只有两种，
 		 * 分别是 '服务器接收客户端的获取请求' 和 '客户端接收服务器的反馈' ，
 		 * 所以只需要一个很简单的文本分割or正则匹配就OK。 */
-		//unfinished..
+		Msg msg = MessageConstructor.parseMessage(receiveString);
+		if(isServerMode) {
+			if(msg.getCode() == MessageConstructor.Code.UDP.REQUEST_SERVER_ADDRESS_AND_PORT) {
+				String newMsg = serverAddress + ":" + serverPort;
+				sendUdpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.UDP.SERVER_ADDRESS_AND_PORT_FEEDBACK, newMsg));
+			}
+			if(msg.getCode() == MessageConstructor.Code.UDP.SERVER_ADDRESS_AND_PORT_FEEDBACK) {
+				Msg tmp = MessageConstructor.parseIPAP(msg.getMessage());
+				serverAddress = tmp.getMessage();
+				serverPort = tmp.getCode();
+			}
+		}
 	}
 	@Override
 	public void tcpCallBack(String receiveString) {
 		// TODO Auto-generated method stub
-		
+		System.out.println(receiveString);
 	}
 	@Override
 	public void sendUdpMessage(String message) {
 		// TODO Auto-generated method stub
-		
+		udpUtil.sendUdpPacket(message);
 	}
 	@Override
 	public void sendTcpMessage(String message) {
 		// TODO Auto-generated method stub
-		
+		tcpUtil.sendMessage(message);
 	}
 	@Override
 	public void sendTdpMessagePrivate(String message, String nickname) {
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public String getNickname() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -11,14 +11,16 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import control.BackstageInterface;
+
 public class TcpUtil {
 	private static TcpUtil tcpUtil;
-//	private List<Socket> socketlist=new ArrayList<Socket>();
 	private List<SocketInfo> socketinfolist = new ArrayList<SocketInfo>();
+	private BackstageInterface backstageInterface;
 	/**
 	 * 服务端用的构造器
 	 */
-	private TcpUtil(int port) {
+	private TcpUtil(int port, BackstageInterface bif) {
 		try {
 			final ServerSocket server = new ServerSocket(port);
 			for(int i = 0;i<10;i++){
@@ -54,7 +56,7 @@ public class TcpUtil {
 	 * @param serverAddress 服务端地址
 	 * @param port 服务端端口
 	 */
-	private TcpUtil(String serverAddress, int port) {
+	private TcpUtil(String serverAddress, int port, BackstageInterface bif) {
 		try {
 			Socket socket = new Socket(serverAddress, port);
 			socketinfolist.add(new SocketInfo(serverAddress,port,socket));
@@ -66,15 +68,15 @@ public class TcpUtil {
 			e.printStackTrace();
 		}
 	}
-	public static TcpUtil getTcpUtilOfServer(int port) {
+	public static TcpUtil getTcpUtilOfServer(int port, BackstageInterface bif) {
 		if(tcpUtil == null) {
-			return new TcpUtil(port);
+			return new TcpUtil(port, bif);
 		}
 		return tcpUtil;
 	}
-	public static TcpUtil getTcpUtilOfClient(String serverAddress, int port) {
+	public static TcpUtil getTcpUtilOfClient(String serverAddress, int port, BackstageInterface bif) {
 		if(tcpUtil == null) {
-			return new TcpUtil(serverAddress, port);
+			return new TcpUtil(serverAddress, port, bif);
 		}
 		return tcpUtil;
 	}
@@ -111,7 +113,8 @@ public class TcpUtil {
 				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				while(true){
 					String message = reader.readLine();
-			    	System.out.println("text received : "+message);
+					backstageInterface.tcpCallBack(message);
+//			    	System.out.println("text received : "+message);
 				}    	
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
