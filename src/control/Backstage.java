@@ -144,7 +144,20 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public void tcpCallBack(String receiveString) {
 		// TODO Auto-generated method stub
+		Msg msg = MessageConstructor.parseMessage(receiveString);
 		System.out.println(receiveString);
+		if(isServerMode){
+			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER){
+				String newMessage;
+				newMessage = "¿Í»§¶Ëinfo" + msg.getMessage();
+				window.echoMessage(newMessage);
+				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, newMessage));
+			}else{
+				if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT){
+					window.echoMessage(msg.getMessage());
+				}
+			}
+		}
 	}
 	@Override
 	public void sendUdpMessage(String message) {
