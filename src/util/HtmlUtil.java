@@ -10,7 +10,7 @@ public class HtmlUtil {
 	 * @return 处理后的HTML文本。
 	 */
 	public static String formatText2HTML(String origin) {
-		String escaped = origin.replaceAll(" ", "&nbsp;");
+		String escaped = protect(origin);
 		String[] res = escaped.split("\n");
 		StringBuilder stringBuilder = new StringBuilder();
 		for(String s : res) {
@@ -30,6 +30,16 @@ public class HtmlUtil {
 		stringBuilder.append("</ul>");
 		return stringBuilder.toString();
 	}
+	public static String addSystemInfo(String info, String s) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("<ul>");
+		stringBuilder.append("<font color=\"#088880\"><strong>");
+		stringBuilder.append(info);
+		stringBuilder.append("</strong>:</font>");
+		stringBuilder.append(s);
+		stringBuilder.append("</ul>");
+		return stringBuilder.toString();
+	}
 	/**
 	 * 把新的内容追加到原HTML中。
 	 * @param newContent
@@ -43,8 +53,28 @@ public class HtmlUtil {
 	public static String getBase() {
 		return "<html><style type=\"text/css\"> ul{ margin: 4px; list-style-type:none; } div{ text-align:center; }</style><body></body></html>";
 	}
-	public static String welcome(String originHTML, String nickname) {
-		String s = "<div><font color=\"#880000\">欢迎 " + nickname + " 进入本聊天室。</font></div>";
-		return append(originHTML, s);
+	public static String welcome(String nickname) {
+		String s = "<div><font color=\"#880000\">欢迎 " + protect(nickname) + " 进入了聊天室。</font></div>";
+		return s;
+	}
+	public static String leave(String nickname) {
+		String s = "<div><font color=\"#000088\">用户 " + protect(nickname) + " 离开了聊天室。</font></div>";
+		return s;
+	}
+	/**
+	 * 这个方法就厉害了。
+	 * 防止直接输入html代码到聊天窗口或昵称上导致的标签注入。
+	 * @author Shinrai
+	 * @param origin 可能存在标签注入的字符串。
+	 * @return
+	 */
+	private static String protect(String origin) {
+		String r;
+		r = origin.replaceAll("&", "&amp;");
+		r = r.replaceAll(" ", "&nbsp;");
+		r = r.replaceAll("\"", "&quot;");
+		r = r.replaceAll("<", "&lt;");
+		r = r.replaceAll(">", "&gt;");
+		return r;
 	}
 }

@@ -9,6 +9,7 @@ import javax.swing.event.DocumentListener;
 
 import control.BackstageInterface;
 import control.WindowInterface;
+import util.TcpUtil.SocketInfo;
 
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
@@ -209,5 +210,11 @@ public class LoginWindow implements WindowInterface {
 			frmLogin.dispose();
 		}
 		btnLogin.setEnabled(true);
+	}
+
+	@Override
+	public void addOrDeleteServerListItem(SocketInfo socketInfo, String nickname) {
+		// TODO Auto-generated method stub
+		
 	}
 }

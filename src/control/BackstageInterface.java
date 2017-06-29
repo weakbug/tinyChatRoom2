@@ -1,5 +1,6 @@
 package control;
 
+
 import util.TcpUtil.SocketInfo;
 
 /**
@@ -21,4 +22,7 @@ public interface BackstageInterface {
 	public void tcpCallBack(String receiveString, SocketInfo userInfo);
 	public String getNickname();
 	public void setEchoMessageInterface(WindowInterface wif);
+	public void someEnterOrLeave(String nickname, boolean eol);
+	public void add2ServerList(SocketInfo socketinfo);
+	public void deleteFromServerList(String nickname);
 }

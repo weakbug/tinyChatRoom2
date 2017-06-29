@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,7 +76,9 @@ public class Backstage implements BackstageInterface {
 	public void loginRequest(String nickname) {
 		// TODO Auto-generated method stub
 		this.nickname = nickname;
-		tcpUtil = TcpUtil.getTcpUtilOfClient(serverAddress, serverPort, this);
+		if(tcpUtil == null) {
+			tcpUtil = TcpUtil.getTcpUtilOfClient(serverAddress, serverPort, this);
+		}
 		sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.LOGIN_REQUEST, nickname));
 	}
 	/**
@@ -175,6 +178,8 @@ public class Backstage implements BackstageInterface {
 				if(loginStatus) {
 					/* 允许登录 */
 					userInfo.setNickname(nickname);
+					add2ServerList(userInfo);
+					someEnterOrLeave(nickname, true);
 				}
 				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.LOGIN_FEEDBACK, String.valueOf(loginStatus)));
 			}
@@ -187,5 +192,36 @@ public class Backstage implements BackstageInterface {
 				window.otherFunc(Boolean.parseBoolean(msg.getMessage()));
 			}
 		} 
+	}
+	@Override
+	public void someEnterOrLeave(String nickname, boolean eol) {
+		// TODO Auto-generated method stub
+		if(isServerMode) {
+			String s;
+			/* 用户进入 */
+			if(eol) {
+				s = HtmlUtil.welcome(nickname);
+			}
+			/* 用户离开 */
+			else {
+				s = HtmlUtil.leave(nickname);
+			}
+			window.echoMessage(s);
+			sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, s));
+		}
+	}
+	@Override
+	public void add2ServerList(SocketInfo socketinfo) {
+		// TODO Auto-generated method stub
+		if(isServerMode) {
+			window.addOrDeleteServerListItem(socketinfo, null);
+		}
+	}
+	@Override
+	public void deleteFromServerList(String nickname) {
+		// TODO Auto-generated method stub
+		if(isServerMode) {
+			window.addOrDeleteServerListItem(null, nickname);
+		}
 	}
 }

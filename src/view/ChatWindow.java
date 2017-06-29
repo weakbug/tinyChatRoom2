@@ -18,6 +18,7 @@ import control.BackstageInterface;
 import control.WindowInterface;
 import util.HtmlUtil;
 import util.MessageConstructor;
+import util.TcpUtil.SocketInfo;
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
@@ -238,7 +239,7 @@ public class ChatWindow implements WindowInterface {
 	        }); 
 		dialogueTextPane.setContentType("text/html");
 		scrollPane_1.setViewportView(dialogueTextPane);
-		String html = HtmlUtil.welcome(HtmlUtil.getBase() , backstageInterface.getNickname());
+		String html = HtmlUtil.getBase();
 		dialogueTextPane.setText(html);
 		setChatRecord(html);
 		frmChatroom.getContentPane().add(btnSend);
@@ -266,15 +267,17 @@ public class ChatWindow implements WindowInterface {
 		listModel.addElement(str);
 	}
 	private void deleteFromList(String str){
-		if(listModel.removeElement(str)){
-			return;
-		}else{
-			System.out.println("´íÎó£ºÃ»ÓÐ"+str);
-		}
+		listModel.removeElement(str);
 	}
 
 	@Override
 	public void otherFunc(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addOrDeleteServerListItem(SocketInfo socketInfo, String nickname) {
 		// TODO Auto-generated method stub
 		
 	}

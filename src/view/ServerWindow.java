@@ -94,9 +94,7 @@ public class ServerWindow implements WindowInterface {
 		table = new JTable(dataVec, colHeader);
 		scrollPane.setViewportView(table);
 		/* test */
-//		addUser2Table(new User("shinrai", "0.0.0.0", 81, "xxxxxx"));
-//		addUser2Table(new User("shinrai2", "0.0.0.0", 81, "xxxxxx"));
-//		deleteUserFromTable("shinrai");
+//		addUser2Table(new SocketInfo("xxx", 81, null));
 		
 		scrollPane_1 = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPane_1, 6, SpringLayout.SOUTH, scrollPane);
@@ -177,7 +175,7 @@ public class ServerWindow implements WindowInterface {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				String text = HtmlUtil.formatText2HTML(textField.getText());
-				String appendText = HtmlUtil.addUserInfo("Admin", text);
+				String appendText = HtmlUtil.addSystemInfo("Admin", text);
 				System.out.println("appendText: "+appendText);
 				textField.setText(null);
 				textField.grabFocus();
@@ -206,6 +204,7 @@ public class ServerWindow implements WindowInterface {
 		newLine.add(socketInfo.getAddress());
 		newLine.add(String.valueOf(socketInfo.getPort()));
 		dataVec.add(newLine);
+		table.updateUI();
 	}
 	private void deleteUserFromTable(String nickname) {
 		for (int i = 0;i < dataVec.size(); i++) {
@@ -214,11 +213,25 @@ public class ServerWindow implements WindowInterface {
 				dataVec.remove(data);
 			}
 		}
+		table.updateUI();
 	}
 
 	@Override
 	public void otherFunc(boolean b) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void addOrDeleteServerListItem(SocketInfo socketInfo, String nickname) {
+		// TODO Auto-generated method stub
+		if(socketInfo == null) {
+			System.out.println("Delete:" + nickname);
+			deleteUserFromTable(nickname);
+		}
+		if(nickname == null) {
+			System.out.println("Add:" + socketInfo.toString());
+			addUser2Table(socketInfo);
+		}
 	}
 }

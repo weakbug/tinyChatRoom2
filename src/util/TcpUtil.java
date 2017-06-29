@@ -131,6 +131,8 @@ public class TcpUtil {
 				}
 			} catch (IOException e) {
 				System.out.println(socketInfo.getInfo() + " disconnected..");
+				backstageInterface.someEnterOrLeave(socketInfo.getNickname(), false);
+				backstageInterface.deleteFromServerList(socketInfo.getNickname());
 				socketinfolist.remove(socketInfo);
 				System.out.println(socketinfolist.size() + " person(s) in chatroom now.");
 				// TODO Auto-generated catch block
