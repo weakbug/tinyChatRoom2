@@ -15,16 +15,9 @@ import javax.swing.event.DocumentListener;
 
 import control.BackstageInterface;
 import control.WindowInterface;
-<<<<<<< HEAD
 import util.TcpUtil.SocketInfo;
-=======
-import model.User;
-<<<<<<< HEAD
->>>>>>> parent of 5326d12... server窗口信息发送
-=======
 import util.HtmlUtil;
 import util.MessageConstructor;
->>>>>>> 5326d12d2ca36eb4a9ebc89a7e45e37d9caa4977
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
