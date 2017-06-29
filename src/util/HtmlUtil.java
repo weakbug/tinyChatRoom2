@@ -10,8 +10,8 @@ public class HtmlUtil {
 	 * @return 处理后的HTML文本。
 	 */
 	public static String formatText2HTML(String origin) {
-		origin.replaceAll(" ", "&nbsp");
-		String[] res = origin.split("\n");
+		String escaped = origin.replaceAll(" ", "&nbsp;");
+		String[] res = escaped.split("\n");
 		StringBuilder stringBuilder = new StringBuilder();
 		for(String s : res) {
 			stringBuilder.append("<li>");

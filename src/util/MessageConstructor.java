@@ -10,7 +10,8 @@ public class MessageConstructor {
 			public static final int SERVER_ADDRESS_AND_PORT_FEEDBACK = 1;
 		}
 		public static class TCP {
-			
+			public static final int MESSAGE_FROM_CLIENT_TO_SERVER = 0;
+			public static final int MESSAGE_FROM_SERVER_TO_CLIENT = 1;
 		}
 	}
 	public static class Msg {
@@ -31,6 +32,11 @@ public class MessageConstructor {
 	public static String constructMessage(int code, String additionMessage) {
 		return String.valueOf(code) + "-" + additionMessage;
 	}
+	/**
+	 * 解析消息
+	 * @param s
+	 * @return
+	 */
 	public static Msg parseMessage(String s) {
 		Pattern pattern = Pattern.compile("(\\d+)-(.*)");
 		Matcher matcher = pattern.matcher(s);
@@ -39,6 +45,11 @@ public class MessageConstructor {
 		}
 		return null;
 	}
+	/**
+	 * 解析地址和端口
+	 * @param s
+	 * @return
+	 */
 	public static Msg parseIPAP(String s) {
 		Pattern pattern = Pattern.compile("(\\d+\\.\\d+\\.\\d+\\.\\d+):(\\d+)");
 		Matcher matcher = pattern.matcher(s);
