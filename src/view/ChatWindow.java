@@ -113,7 +113,6 @@ public class ChatWindow implements WindowInterface {
 			public void actionPerformed(ActionEvent e) {
 				String diaText = HtmlUtil.formatText2HTML(inputTextArea.getText());
 				String appendText = HtmlUtil.addUserInfo(backstageInterface.getNickname(), diaText);
-				appendNewDia(appendText);
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
 				String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER, diaText);
