@@ -14,7 +14,7 @@ public interface BackstageInterface {
 	public boolean scanServer();
 	public void sendUdpMessage(String message);
 	public void sendTcpMessage(String message);
-	public void sendTdpMessagePrivate(String message, String nickname);
+	public void sendTcpMessagePrivate(String message, String nickname);
 	public void udpCallBack(String receiveString);
 	public void tcpCallBack(String receiveString);
 	public String getNickname();

@@ -23,8 +23,7 @@ import view.*;
 public class Backstage implements BackstageInterface {
 	private boolean isServerMode;
 	private static Backstage backstage;
-	private WindowInterface serverWindow;
-	private WindowInterface chatWindow;
+	private WindowInterface window;
 	private UdpUtil udpUtil;
 	private TcpUtil tcpUtil;
 	private String serverAddress;
@@ -63,7 +62,7 @@ public class Backstage implements BackstageInterface {
 			System.out.println("SERVER");
 			isServerMode = true;
 			tcpUtil = TcpUtil.getTcpUtilOfServer(serverPort, this);
-			serverWindow = ServerWindow._main(this);
+			window = ServerWindow._main(this);
 			
 		}
 	}
@@ -118,7 +117,7 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public void loadChatWindow(String nickname) {
 		// TODO Auto-generated method stub
-		chatWindow = ChatWindow._main(this);
+		window = ChatWindow._main(this);
 	}
 	@Override
 	public void udpCallBack(String receiveString) {
@@ -158,7 +157,7 @@ public class Backstage implements BackstageInterface {
 		tcpUtil.sendMessage(message);
 	}
 	@Override
-	public void sendTdpMessagePrivate(String message, String nickname) {
+	public void sendTcpMessagePrivate(String message, String nickname) {
 		// TODO Auto-generated method stub
 		
 	}

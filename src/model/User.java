@@ -23,6 +23,10 @@ public class User {
 		this.publicKey = publicKey;
 		chatRecord = null;
 	}
+	public User(String address, int port) {
+		this.ipAddress = address;
+		this.port = port;
+	}
 	@Override
 	public boolean equals(Object anObject) {
 		if(this == anObject) {
