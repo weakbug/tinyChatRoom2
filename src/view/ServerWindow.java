@@ -1,10 +1,17 @@
 package view;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import control.BackstageInterface;
 import control.WindowInterface;
@@ -12,7 +19,12 @@ import control.WindowInterface;
 import util.TcpUtil.SocketInfo;
 =======
 import model.User;
+<<<<<<< HEAD
 >>>>>>> parent of 5326d12... server窗口信息发送
+=======
+import util.HtmlUtil;
+import util.MessageConstructor;
+>>>>>>> 5326d12d2ca36eb4a9ebc89a7e45e37d9caa4977
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
@@ -100,6 +112,61 @@ public class ServerWindow implements WindowInterface {
 		frmServer.getContentPane().add(scrollPane_1);
 		
 		textField = new JTextField();
+		textField.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				if(arg0.isControlDown() && arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					try {
+						((Appendable) textField).append("\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				else if(arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					arg0.consume();
+					btnSend.doClick();
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		textField.getDocument().addDocumentListener(new DocumentListener(){
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				// TODO Auto-generated method stub
+				btnSend.setEnabled(true);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				if(textField.getText().equals("")) {
+					btnSend.setEnabled(false);
+				}
+			}
+			
+		});
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -6, SpringLayout.NORTH, textField);
 		
 		textArea = new JTextArea();
@@ -111,6 +178,23 @@ public class ServerWindow implements WindowInterface {
 		textField.setColumns(10);
 		
 		btnSend = new JButton("Send");
+		btnSend.setEnabled(false);
+		btnSend.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String text = HtmlUtil.formatText2HTML(textField.getText());
+				String appendText = HtmlUtil.addUserInfo("Admin", text);
+				System.out.println("appendText: "+appendText);
+				textField.setText(null);
+				textField.grabFocus();
+				echoMessage(appendText);
+				String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, appendText);
+				backstageInterface.sendTcpMessage(msg);
+			}
+			
+		});
+
 		springLayout.putConstraint(SpringLayout.SOUTH, btnSend, -10, SpringLayout.SOUTH, frmServer.getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, textField, -6, SpringLayout.WEST, btnSend);
 		springLayout.putConstraint(SpringLayout.EAST, btnSend, 0, SpringLayout.EAST, scrollPane);
