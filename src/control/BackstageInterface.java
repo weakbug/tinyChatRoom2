@@ -16,6 +16,7 @@ public interface BackstageInterface {
 	public void sendTcpMessage(String message);
 	public void sendTcpMessagePrivate(String message, String nickname);
 	public void udpCallBack(String receiveString);
-	public void tcpCallBack(String receiveString);
+	public void tcpCallBack(String receiveString, String userInfo);
 	public String getNickname();
+	public void setEchoMessageInterface(WindowInterface wif);
 }

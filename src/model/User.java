@@ -13,19 +13,13 @@ public class User {
 	private String nickname;
 	private String ipAddress;
 	private int port;
-	private String publicKey;
 	private String chatRecord;
 	
-	public User(String nickname, String ipAddress, int port, String publicKey) {
+	public User(String nickname, String ipAddress, int port) {
 		this.nickname = nickname;
 		this.ipAddress = ipAddress;
 		this.port = port;
-		this.publicKey = publicKey;
 		chatRecord = null;
-	}
-	public User(String address, int port) {
-		this.ipAddress = address;
-		this.port = port;
 	}
 	@Override
 	public boolean equals(Object anObject) {
@@ -35,6 +29,9 @@ public class User {
 		if(anObject instanceof User) {
 			User user = (User)anObject;
 			if(this.nickname.equals(user.nickname)) {
+				return true;
+			}
+			if(this.ipAddress.equals(user.ipAddress) && this.port == user.port) {
 				return true;
 			}
 		}
@@ -61,9 +58,6 @@ public class User {
 	public int getPort() {
 		return port;
 	}
-	public String getPublicKey() {
-		return publicKey;
-	}
 	public String getChatRecord() {
 		if(chatRecord == null) {
 			chatRecord = HtmlUtil.getBase();
@@ -78,6 +72,9 @@ public class User {
 	 * @return ¡Ÿ ±”√ªß°£
 	 */
 	public static User getTempUser(String nickname) {
-		return new User(nickname, null, -1, null);
+		return new User(nickname, null, -1);
+	}
+	public static User getTempUser(String ipAddress, int port) {
+		return new User(null, ipAddress, port);
 	}
 }

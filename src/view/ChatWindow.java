@@ -18,6 +18,7 @@ import control.BackstageInterface;
 import control.WindowInterface;
 import model.UserLab;
 import util.HtmlUtil;
+import util.MessageConstructor;
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
@@ -36,7 +37,6 @@ import java.awt.event.ActionEvent;
 public class ChatWindow implements WindowInterface {
 
 	private JFrame frmChatroom;
-	private static ChatWindow window;
 	private BackstageInterface backstageInterface;
 	private JTextArea inputTextArea;
 	private JTextPane dialogueTextPane;
@@ -47,7 +47,7 @@ public class ChatWindow implements WindowInterface {
 	/**
 	 * Launch the application.
 	 */
-	public static WindowInterface _main(final BackstageInterface bif) {
+	public static void _main(final BackstageInterface bif) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e1) {
@@ -57,14 +57,13 @@ public class ChatWindow implements WindowInterface {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					window = new ChatWindow(bif);
+					ChatWindow window = new ChatWindow(bif);
 					window.frmChatroom.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		return window;
 	}
 
 	/**
@@ -72,6 +71,7 @@ public class ChatWindow implements WindowInterface {
 	 */
 	public ChatWindow(BackstageInterface bif) {
 		backstageInterface = bif;
+		backstageInterface.setEchoMessageInterface(this);
 		initialize();
 	}
 
@@ -119,7 +119,8 @@ public class ChatWindow implements WindowInterface {
 				dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
-				backstageInterface.sendTcpMessage(diaText);
+				String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER, diaText);
+				backstageInterface.sendTcpMessage(msg);
 			}
 		});
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane_2, -6, SpringLayout.WEST, btnSend);

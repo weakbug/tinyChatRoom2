@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import model.User;
+import util.HtmlUtil;
 import util.MessageConstructor;
 import util.MessageConstructor.Msg;
 import util.NetworkUtil;
@@ -41,8 +42,8 @@ public class Backstage implements BackstageInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		serverPort = 7747;
-		//初始化socket(udp)部分
+		serverPort = 7747;//随机服务器端口这个功能搁一下
+		/* 初始化socket(udp)部分 */
 		udpUtil = new UdpUtil(this);
 	}
 
@@ -62,8 +63,7 @@ public class Backstage implements BackstageInterface {
 			System.out.println("SERVER");
 			isServerMode = true;
 			tcpUtil = TcpUtil.getTcpUtilOfServer(serverPort, this);
-			window = ServerWindow._main(this);
-			
+			ServerWindow._main(this);
 		}
 	}
 	/**
@@ -79,7 +79,6 @@ public class Backstage implements BackstageInterface {
 		}
 		this.nickname = nickname;
 		tcpUtil = TcpUtil.getTcpUtilOfClient(serverAddress, serverPort, this);
-		tcpUtil.sendMessage("test");
 //		try {
 //			Thread.sleep(500);
 //		} catch (InterruptedException e) {
@@ -117,7 +116,7 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public void loadChatWindow(String nickname) {
 		// TODO Auto-generated method stub
-		window = ChatWindow._main(this);
+		ChatWindow._main(this);
 	}
 	@Override
 	public void udpCallBack(String receiveString) {
@@ -142,18 +141,18 @@ public class Backstage implements BackstageInterface {
 		}
 	}
 	@Override
-	public void tcpCallBack(String receiveString) {
+	public void tcpCallBack(String receiveString, String userInfo) {
 		// TODO Auto-generated method stub
 		Msg msg = MessageConstructor.parseMessage(receiveString);
 		System.out.println(receiveString);
 		if(isServerMode){
 			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER){
-				String newMessage;
-				newMessage = "客户端info" + msg.getMessage();
+				String newMessage = HtmlUtil.addUserInfo(userInfo, msg.getMessage());
 				window.echoMessage(newMessage);
 				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, newMessage));
 			}else{
 				if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT){
+					System.out.println(msg.getMessage());
 					window.echoMessage(msg.getMessage());
 				}
 			}
@@ -178,5 +177,10 @@ public class Backstage implements BackstageInterface {
 	public String getNickname() {
 		// TODO Auto-generated method stub
 		return nickname;
+	}
+	@Override
+	public void setEchoMessageInterface(WindowInterface wif) {
+		// TODO Auto-generated method stub
+		window = wif;
 	}
 }

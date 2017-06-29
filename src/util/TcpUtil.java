@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import control.BackstageInterface;
+import model.UserLab;
 
 public class TcpUtil {
 	private static TcpUtil tcpUtil;
@@ -119,8 +120,9 @@ public class TcpUtil {
 				reader = new BufferedReader(new InputStreamReader(socketInfo.getSocket().getInputStream()));
 				while(true){
 					String message = reader.readLine();
-					backstageInterface.tcpCallBack(message);
-				}    	
+					String info = UserLab.getUserLab().getUser(socketInfo.getAddress(), socketInfo.getPort()).toString();
+					backstageInterface.tcpCallBack(message, info);
+				}
 			} catch (IOException e) {
 				System.out.println(socketInfo.getInfo() + " disconnected..");
 				socketinfolist.remove(socketInfo);
@@ -159,6 +161,12 @@ public class TcpUtil {
 		}
 		public String getInfo() {
 			return ipAddress + ":" + port;
+		}
+		public String getAddress() {
+			return ipAddress;
+		}
+		public int getPort() {
+			return port;
 		}
 		@Override 
 		public boolean equals(Object anObject) {

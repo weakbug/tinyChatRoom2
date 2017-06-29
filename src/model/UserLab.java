@@ -26,6 +26,13 @@ public class UserLab {
 		if(index != -1) {
 			return userList.get(index);
 		}
-		return new User("error", "0.0.0.0", 88, null);//出错保护
+		return new User("error", "0.0.0.0", 88);//出错保护
+	}
+	public User getUser(String ipAddress, int port) {
+		int index = userList.indexOf(User.getTempUser(ipAddress, port));
+		if(index != -1) {
+			return userList.get(index);
+		}
+		return new User("error", "0.0.0.0", 88);//出错保护
 	}
 }

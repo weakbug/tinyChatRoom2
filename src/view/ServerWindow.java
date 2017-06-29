@@ -25,14 +25,13 @@ public class ServerWindow implements WindowInterface {
 	private JTextField textField;
 	private JButton btnSend;
 	private JTextArea textArea;
-	private static ServerWindow window;
 	private BackstageInterface backstageInterface;
 	private Vector<Vector<String>> dataVec;
 
 	/**
 	 * Launch the application.
 	 */
-	public static WindowInterface _main(final BackstageInterface bif) {
+	public static void _main(final BackstageInterface bif) {
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e1) {
@@ -42,14 +41,13 @@ public class ServerWindow implements WindowInterface {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					window = new ServerWindow(bif);
+					ServerWindow window = new ServerWindow(bif);
 					window.frmServer.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		return window;
 	}
 
 	/**
@@ -57,6 +55,7 @@ public class ServerWindow implements WindowInterface {
 	 */
 	public ServerWindow(BackstageInterface bif) {
 		backstageInterface = bif;
+		backstageInterface.setEchoMessageInterface(this);
 		initialize();
 	}
 
@@ -82,7 +81,6 @@ public class ServerWindow implements WindowInterface {
         colHeader.add("nickname"); 
         colHeader.add("ip address"); 
         colHeader.add("port"); 
-        colHeader.add("publicKey"); 
         dataVec = new Vector<Vector<String>>(); 
 		table = new JTable(dataVec, colHeader);
 		scrollPane.setViewportView(table);
@@ -124,7 +122,6 @@ public class ServerWindow implements WindowInterface {
 		newLine.add(user.getNickname());
 		newLine.add(user.getIpAddress());
 		newLine.add(String.valueOf(user.getPort()));
-		newLine.add(user.getPublicKey());
 		dataVec.add(newLine);
 	}
 	private void deleteUserFromTable(String nickname) {
