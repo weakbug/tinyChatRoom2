@@ -99,6 +99,7 @@ public class ServerWindow implements WindowInterface {
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -6, SpringLayout.NORTH, textField);
 		
 		textArea = new JTextArea();
+		textArea.setEditable(false);
 		scrollPane_1.setViewportView(textArea);
 		springLayout.putConstraint(SpringLayout.WEST, textField, 10, SpringLayout.WEST, frmServer.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, textField, -10, SpringLayout.SOUTH, frmServer.getContentPane());
@@ -115,7 +116,8 @@ public class ServerWindow implements WindowInterface {
 	@Override
 	public void echoMessage(String message) {
 		// TODO Auto-generated method stub
-		
+		textArea.append(message + "\n");
+		textArea.setCaretPosition(textArea.getDocument().getLength());
 	}
 	private void addUser2Table(User user) {
 		Vector<String> newLine = new Vector<String>(); 

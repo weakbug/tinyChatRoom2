@@ -150,11 +150,11 @@ public class Backstage implements BackstageInterface {
 				String newMessage = HtmlUtil.addUserInfo(userInfo, msg.getMessage());
 				window.echoMessage(newMessage);
 				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, newMessage));
-			}else{
-				if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT){
-					System.out.println(msg.getMessage());
-					window.echoMessage(msg.getMessage());
-				}
+			}
+		}
+		else {
+			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT){
+				window.echoMessage(msg.getMessage());
 			}
 		}
 	}

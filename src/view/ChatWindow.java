@@ -113,10 +113,7 @@ public class ChatWindow implements WindowInterface {
 			public void actionPerformed(ActionEvent e) {
 				String diaText = HtmlUtil.formatText2HTML(inputTextArea.getText());
 				String appendText = HtmlUtil.addUserInfo(backstageInterface.getNickname(), diaText);
-				String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
-				dialogueTextPane.setText(allText);
-				setChatRecord(allText);
-				dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
+				appendNewDia(appendText);
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
 				String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER, diaText);
@@ -248,11 +245,17 @@ public class ChatWindow implements WindowInterface {
 		setChatRecord(html);
 		frmChatroom.getContentPane().add(btnSend);
 	}
-
+	private void appendNewDia(String appendText) {
+		String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
+		dialogueTextPane.setText(allText);
+		setChatRecord(allText);
+		dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
+	}
 	@Override
 	public void echoMessage(String message) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("echoMessage");
+		appendNewDia(message);
 	}
 
 	private String getChatRecord() {
