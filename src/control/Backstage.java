@@ -12,10 +12,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import model.User;
 import util.HtmlUtil;
 import util.MessageConstructor;
 import util.MessageConstructor.Msg;
+import util.TcpUtil.SocketInfo;
 import util.NetworkUtil;
 import util.TcpUtil;
 import util.UdpUtil;
@@ -72,20 +72,11 @@ public class Backstage implements BackstageInterface {
 	 * @return 是否允许登录。
 	 */
 	@Override
-	public boolean loginRequest(String nickname) {
+	public void loginRequest(String nickname) {
 		// TODO Auto-generated method stub
-		if(nickname.matches(User.banNickname)) {
-			return false;
-		}
 		this.nickname = nickname;
 		tcpUtil = TcpUtil.getTcpUtilOfClient(serverAddress, serverPort, this);
-//		try {
-//			Thread.sleep(500);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		return true;
+		sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.LOGIN_REQUEST, nickname));
 	}
 	/**
 	 * LoginWindow 窗口调用
@@ -114,7 +105,7 @@ public class Backstage implements BackstageInterface {
 		return false;
 	}
 	@Override
-	public void loadChatWindow(String nickname) {
+	public void loadChatWindow() {
 		// TODO Auto-generated method stub
 		ChatWindow._main(this);
 	}
@@ -140,24 +131,7 @@ public class Backstage implements BackstageInterface {
 			}
 		}
 	}
-	@Override
-	public void tcpCallBack(String receiveString, String userInfo) {
-		// TODO Auto-generated method stub
-		Msg msg = MessageConstructor.parseMessage(receiveString);
-		System.out.println(receiveString);
-		if(isServerMode){
-			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER){
-				String newMessage = HtmlUtil.addUserInfo(userInfo, msg.getMessage());
-				window.echoMessage(newMessage);
-				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, newMessage));
-			}
-		}
-		else {
-			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT){
-				window.echoMessage(msg.getMessage());
-			}
-		}
-	}
+
 	@Override
 	public void sendUdpMessage(String message) {
 		// TODO Auto-generated method stub
@@ -182,5 +156,36 @@ public class Backstage implements BackstageInterface {
 	public void setEchoMessageInterface(WindowInterface wif) {
 		// TODO Auto-generated method stub
 		window = wif;
+	}
+	@Override
+	public void tcpCallBack(String receiveString, SocketInfo userInfo) {
+		// TODO Auto-generated method stub
+		Msg msg = MessageConstructor.parseMessage(receiveString);
+		System.out.println(receiveString);
+		if(isServerMode){
+			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER) {
+				String newMessage = HtmlUtil.addUserInfo(userInfo.toString(), msg.getMessage());
+				window.echoMessage(newMessage);
+				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, newMessage));
+			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_REQUEST) {
+				String nickname = msg.getMessage();
+				boolean loginStatus = !tcpUtil.isContain(nickname);
+				System.out.println(loginStatus);
+				if(loginStatus) {
+					/* 允许登录 */
+					userInfo.setNickname(nickname);
+				}
+				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.LOGIN_FEEDBACK, String.valueOf(loginStatus)));
+			}
+		}
+		else {
+			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT) {
+				window.echoMessage(msg.getMessage());
+			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_FEEDBACK) {
+				window.otherFunc(Boolean.parseBoolean(msg.getMessage()));
+			}
+		} 
 	}
 }

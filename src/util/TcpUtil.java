@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import control.BackstageInterface;
-import model.UserLab;
 
 public class TcpUtil {
 	private static TcpUtil tcpUtil;
@@ -40,6 +39,7 @@ public class TcpUtil {
 								e.printStackTrace();
 							}
 							if(connect != null) {
+								System.out.println(connect.getPort());
 								SocketInfo newSocketInfo = new SocketInfo(connect.getInetAddress().getHostAddress(),connect.getPort(), connect);
 								socketinfolist.add(newSocketInfo);
 								System.out.println(newSocketInfo.getInfo() + " connected..");
@@ -87,6 +87,13 @@ public class TcpUtil {
 		}
 		return tcpUtil;
 	}
+	public boolean isContain(String nickname) {
+		SocketInfo tmpInfo = new SocketInfo(nickname);
+		if(socketinfolist.contains(tmpInfo)) {
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * 
 	 * @param msg 需要发送的消息
@@ -120,8 +127,7 @@ public class TcpUtil {
 				reader = new BufferedReader(new InputStreamReader(socketInfo.getSocket().getInputStream()));
 				while(true){
 					String message = reader.readLine();
-					String info = UserLab.getUserLab().getUser(socketInfo.getAddress(), socketInfo.getPort()).toString();
-					backstageInterface.tcpCallBack(message, info);
+					backstageInterface.tcpCallBack(message, socketInfo);
 				}
 			} catch (IOException e) {
 				System.out.println(socketInfo.getInfo() + " disconnected..");
@@ -133,27 +139,34 @@ public class TcpUtil {
 			}
 		}).start();	
 	}
-		
 	
-	public SocketInfo searchSocket(String ipAddress,Integer port){
-		int index;
-		SocketInfo temp = new SocketInfo(ipAddress,port);
-		index = socketinfolist.indexOf(temp);
-		if(index != -1) {
-			return socketinfolist.get(index);
-		}
-		return null;
-	}
+//	public SocketInfo searchSocket(String ipAddress,Integer port){
+//		int index;
+//		SocketInfo temp = new SocketInfo(ipAddress,port);
+//		index = socketinfolist.indexOf(temp);
+//		if(index != -1) {
+//			return socketinfolist.get(index);
+//		}
+//		return null;
+//	}
+	
 	public static class SocketInfo{
 		private String ipAddress;
 		private Integer port;
 		private Socket socket;
-		SocketInfo(String a,Integer b){
-			ipAddress = a;
-			port = b;
+		private String nickname;
+		
+		private SocketInfo(String address,int port){
+			ipAddress = address;
+			this.port = port;
 		}
-		SocketInfo(String a, Integer b, Socket socket) {
-			this(a, b);
+		/* 判断时构造 */
+		public SocketInfo(String nickname) {
+			this.nickname = nickname;
+		}
+		/* 连接时构造 */
+		public SocketInfo(String address, int port, Socket socket) {
+			this(address, port);
 			this.socket = socket;
 		}
 		public Socket getSocket() {
@@ -168,6 +181,23 @@ public class TcpUtil {
 		public int getPort() {
 			return port;
 		}
+		public void setNickname(String nk) {
+			nickname = nk;
+		}
+		public String getNickname() {
+			return nickname;
+		}
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(nickname);
+			sb.append('(');
+			sb.append(ipAddress);
+			sb.append(':');
+			sb.append(String.valueOf(port));
+			sb.append(')');
+			return sb.toString();
+		}
 		@Override 
 		public boolean equals(Object anObject) {
 			if(this == anObject) {
@@ -175,100 +205,14 @@ public class TcpUtil {
 			}
 			if(anObject instanceof SocketInfo) {
 				SocketInfo si = (SocketInfo)anObject;
-				if(this.ipAddress.equals(si.ipAddress) && this.port == si.port) {
+//				if(this.ipAddress.equals(si.ipAddress) && this.port == si.port) {
+//					return true;
+//				}
+				if(this.nickname.equals(si.nickname)) {
 					return true;
 				}
 			}
 			return false;
 		}
 	}
-	
-//	private static void execute(Socket client){
-//		try {
-//			OutputStream out = client.getOutputStream();
-//			BufferedReader buf = new BufferedReader(new InputStreamReader(client.getInputStream()));
-//			boolean flag = true;
-//			while(flag){
-//				String str = buf.readLine();
-//				if(str==null || "".equals(str)){
-//					flag = false;
-//				}else{
-//					if("over".equals(str)){
-//						flag = false;
-//					}else{
-//						out.write("Message has been received".getBytes());
-//					}
-//				}
-//			}
-//			for(Socket a:socketlist){
-//				if(a.equals(client)){
-//					a=null;
-//					break;
-//				}
-//			}
-//			out.close();
-//			buf.close();
-//			client.close();
-//		
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//	}
-//	
-//	public static ServerSocket getServer() throws IOException{
-//		final ServerSocket server = new ServerSocket(20086);
-//		for(int i = 0;i<100;i++){
-//			Thread thread = new Thread(){
-//				public void run(){
-//					while(true){
-//						try{
-//							Socket client = server.accept();
-//							for(int i=0;i<100;i++){
-//								if(socketlist[i]==null){
-//									socketlist[i] = client;
-//									break;
-//								}
-//							}
-//							execute(client);
-//						}catch(IOException e){
-//							e.printStackTrace();
-//						}
-//					}
-//				}
-//			};
-//			thread.start();
-//		}
-//		return server;
-//	}
-//	
-//    public static Socket getClient() throws UnknownHostException, IOException{
-//    	Socket socket = new Socket("224.0.0.1",20086);
-//    	OutputStream out=socket.getOutputStream();
-//    	out.write("请求连接".getBytes());
-//    	out.close();
-//    	return socket;
-//    }
-//    
-//    public void ClientSendMessge(Socket client,String str) throws IOException{
-//    	OutputStream out=client.getOutputStream();
-//    	out.write(str.getBytes());
-//    }
-//    
-//    public void ServerSendMessage(Socket[] socketlist,String str) throws IOException{
-//    	for(Socket a:socketlist){
-//    		OutputStream out = a.getOutputStream();
-//    	    out.write(str.getBytes());
-//    	}
-//    }
-//    
-//    public void receiveMessage(Socket client) throws IOException{
-//    	InputStream in=client.getInputStream();
-//    	byte[] buf = new byte[1024];
-//    	int len = in.read(buf);
-//    	String text = new String(buf,0,len);
-//    }
-    
-   
 }

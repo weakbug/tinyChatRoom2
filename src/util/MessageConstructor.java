@@ -12,6 +12,8 @@ public class MessageConstructor {
 		public static class TCP {
 			public static final int MESSAGE_FROM_CLIENT_TO_SERVER = 0;
 			public static final int MESSAGE_FROM_SERVER_TO_CLIENT = 1;
+			public static final int LOGIN_REQUEST = 3;
+			public static final int LOGIN_FEEDBACK = 4;
 		}
 	}
 	public static class Msg {

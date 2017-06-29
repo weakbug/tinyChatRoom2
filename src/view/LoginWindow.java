@@ -8,6 +8,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import control.BackstageInterface;
+import control.WindowInterface;
 
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
@@ -20,7 +21,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 
-public class LoginWindow {
+public class LoginWindow implements WindowInterface {
 
 	private JFrame frmLogin;
 	private JTextField nicknameTextField;
@@ -57,6 +58,7 @@ public class LoginWindow {
 	 */
 	public LoginWindow(BackstageInterface bif) {
 		backstageInterface = bif;
+		backstageInterface.setEchoMessageInterface(this);
 		initialize();
 	}
 
@@ -178,15 +180,7 @@ public class LoginWindow {
 					public void run() {
 						// TODO Auto-generated method stub
 						String nickname = nicknameTextField.getText();
-						boolean rs = backstageInterface.loginRequest(nickname);
-						if(rs == false) {
-							JOptionPane.showMessageDialog(null, "êÇ³Æ·Ç·¨»òêÇ³ÆÒÑ´æÔÚ¡£", "µÇÂ¼Ê§°Ü", JOptionPane.ERROR_MESSAGE);
-						}
-						else {
-							backstageInterface.loadChatWindow(nickname);
-							frmLogin.dispose();
-						}
-						btnLogin.setEnabled(true);
+						backstageInterface.loginRequest(nickname);
 					}
 				}).start();
 			}
@@ -196,5 +190,24 @@ public class LoginWindow {
 		springLayout.putConstraint(SpringLayout.NORTH, btnLogin, 0, SpringLayout.NORTH, nicknameTextField);
 		springLayout.putConstraint(SpringLayout.EAST, btnLogin, -10, SpringLayout.EAST, frmLogin.getContentPane());
 		frmLogin.getContentPane().add(btnLogin);
+	}
+
+	@Override
+	public void echoMessage(String message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void otherFunc(boolean b) {
+		// TODO Auto-generated method stub
+		if(b == false) {
+			JOptionPane.showMessageDialog(null, "êÇ³Æ·Ç·¨»òêÇ³ÆÒÑ´æÔÚ¡£", "µÇÂ¼Ê§°Ü", JOptionPane.ERROR_MESSAGE);
+		}
+		else {
+			backstageInterface.loadChatWindow();
+			frmLogin.dispose();
+		}
+		btnLogin.setEnabled(true);
 	}
 }

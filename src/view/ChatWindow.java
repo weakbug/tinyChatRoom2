@@ -16,7 +16,6 @@ import javax.swing.text.html.ParagraphView;
 
 import control.BackstageInterface;
 import control.WindowInterface;
-import model.UserLab;
 import util.HtmlUtil;
 import util.MessageConstructor;
 
@@ -272,5 +271,11 @@ public class ChatWindow implements WindowInterface {
 		}else{
 			System.out.println("´íÎó£ºÃ»ÓÐ"+str);
 		}
+	}
+
+	@Override
+	public void otherFunc(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
 }

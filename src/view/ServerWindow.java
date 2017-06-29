@@ -8,7 +8,7 @@ import javax.swing.UIManager;
 
 import control.BackstageInterface;
 import control.WindowInterface;
-import model.User;
+import util.TcpUtil.SocketInfo;
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
@@ -119,11 +119,11 @@ public class ServerWindow implements WindowInterface {
 		textArea.append(message + "\n");
 		textArea.setCaretPosition(textArea.getDocument().getLength());
 	}
-	private void addUser2Table(User user) {
+	private void addUser2Table(SocketInfo socketInfo) {
 		Vector<String> newLine = new Vector<String>(); 
-		newLine.add(user.getNickname());
-		newLine.add(user.getIpAddress());
-		newLine.add(String.valueOf(user.getPort()));
+		newLine.add(socketInfo.getNickname());
+		newLine.add(socketInfo.getAddress());
+		newLine.add(String.valueOf(socketInfo.getPort()));
 		dataVec.add(newLine);
 	}
 	private void deleteUserFromTable(String nickname) {
@@ -133,5 +133,11 @@ public class ServerWindow implements WindowInterface {
 				dataVec.remove(data);
 			}
 		}
+	}
+
+	@Override
+	public void otherFunc(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
 }
