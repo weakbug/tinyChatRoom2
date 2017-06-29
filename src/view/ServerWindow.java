@@ -8,7 +8,11 @@ import javax.swing.UIManager;
 
 import control.BackstageInterface;
 import control.WindowInterface;
+<<<<<<< HEAD
 import util.TcpUtil.SocketInfo;
+=======
+import model.User;
+>>>>>>> parent of 5326d12... server窗口信息发送
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
