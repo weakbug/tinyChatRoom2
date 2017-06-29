@@ -112,7 +112,7 @@ public class ChatWindow implements WindowInterface {
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String diaText = HtmlUtil.formatText2HTML(inputTextArea.getText());
-				String appendText = HtmlUtil.addUserInfo(null, diaText);
+				String appendText = HtmlUtil.addUserInfo(backstageInterface.getNickname(), diaText);
 				String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
 				dialogueTextPane.setText(allText);
 				setChatRecord(allText);

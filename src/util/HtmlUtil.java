@@ -24,7 +24,7 @@ public class HtmlUtil {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("<ul>");
 		stringBuilder.append("<font color=\"#008800\">");
-		stringBuilder.append((info==null)?"×Ô¼º":info);
+		stringBuilder.append(info);
 		stringBuilder.append(":</font>");
 		stringBuilder.append(s);
 		stringBuilder.append("</ul>");

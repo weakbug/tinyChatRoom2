@@ -39,9 +39,11 @@ public class TcpUtil {
 								e.printStackTrace();
 							}
 							if(connect != null) {
-//								socketlist.add(connect);
-								socketinfolist.add(new SocketInfo(connect.getInetAddress().toString(),connect.getPort(), connect));
-								exec(connect);
+								SocketInfo newSocketInfo = new SocketInfo(connect.getInetAddress().getHostAddress(),connect.getPort(), connect);
+								socketinfolist.add(newSocketInfo);
+								System.out.println(newSocketInfo.getInfo() + " connected..");
+								System.out.println(socketinfolist.size() + " person(s) in chatroom now.");
+								exec(newSocketInfo);
 							}
 						}
 					}
@@ -61,7 +63,9 @@ public class TcpUtil {
 		backstageInterface = bif;
 		try {
 			Socket socket = new Socket(serverAddress, port);
-			socketinfolist.add(new SocketInfo(serverAddress,port,socket));
+			SocketInfo newSocketInfo = new SocketInfo(serverAddress,port,socket);
+			socketinfolist.add(newSocketInfo);
+			exec(newSocketInfo);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -106,18 +110,21 @@ public class TcpUtil {
 			}
 		}).start();
 	}
-	private void exec(final Socket socket) {//接收信息，回调
+	private void exec(final SocketInfo socketInfo) {//接收信息，回调
 		new Thread(new Runnable(){
 			@Override
 			public void run(){
 				try{
 				BufferedReader reader = null;
-				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				reader = new BufferedReader(new InputStreamReader(socketInfo.getSocket().getInputStream()));
 				while(true){
 					String message = reader.readLine();
 					backstageInterface.tcpCallBack(message);
 				}    	
 			} catch (IOException e) {
+				System.out.println(socketInfo.getInfo() + " disconnected..");
+				socketinfolist.remove(socketInfo);
+				System.out.println(socketinfolist.size() + " person(s) in chatroom now.");
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
@@ -126,16 +133,16 @@ public class TcpUtil {
 	}
 		
 	
-	public Socket searchSocket(String ipAddress,Integer port){
+	public SocketInfo searchSocket(String ipAddress,Integer port){
 		int index;
 		SocketInfo temp = new SocketInfo(ipAddress,port);
 		index = socketinfolist.indexOf(temp);
 		if(index != -1) {
-			return socketinfolist.get(index).getSocket();
+			return socketinfolist.get(index);
 		}
 		return null;
 	}
-	class SocketInfo{
+	public static class SocketInfo{
 		private String ipAddress;
 		private Integer port;
 		private Socket socket;
@@ -149,6 +156,9 @@ public class TcpUtil {
 		}
 		public Socket getSocket() {
 			return socket;
+		}
+		public String getInfo() {
+			return ipAddress + ":" + port;
 		}
 		@Override 
 		public boolean equals(Object anObject) {
