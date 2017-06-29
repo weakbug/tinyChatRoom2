@@ -21,6 +21,7 @@ public class TcpUtil {
 	 * 服务端用的构造器
 	 */
 	private TcpUtil(int port, BackstageInterface bif) {
+		backstageInterface = bif;
 		try {
 			final ServerSocket server = new ServerSocket(port);
 			for(int i = 0;i<10;i++){
@@ -57,6 +58,7 @@ public class TcpUtil {
 	 * @param port 服务端端口
 	 */
 	private TcpUtil(String serverAddress, int port, BackstageInterface bif) {
+		backstageInterface = bif;
 		try {
 			Socket socket = new Socket(serverAddress, port);
 			socketinfolist.add(new SocketInfo(serverAddress,port,socket));
@@ -114,7 +116,6 @@ public class TcpUtil {
 				while(true){
 					String message = reader.readLine();
 					backstageInterface.tcpCallBack(message);
-//			    	System.out.println("text received : "+message);
 				}    	
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

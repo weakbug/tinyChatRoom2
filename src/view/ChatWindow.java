@@ -111,14 +111,15 @@ public class ChatWindow implements WindowInterface {
 		btnSend.setEnabled(false);
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String appendText = HtmlUtil.formatText2HTML(null, inputTextArea.getText());
+				String diaText = HtmlUtil.formatText2HTML(inputTextArea.getText());
+				String appendText = HtmlUtil.addUserInfo(null, diaText);
 				String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
 				dialogueTextPane.setText(allText);
 				setChatRecord(allText);
 				dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
-				backstageInterface.sendTcpMessage(appendText);
+				backstageInterface.sendTcpMessage(diaText);
 			}
 		});
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane_2, -6, SpringLayout.WEST, btnSend);

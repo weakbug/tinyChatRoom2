@@ -9,18 +9,25 @@ public class HtmlUtil {
 	 * @param origin 原始文本。
 	 * @return 处理后的HTML文本。
 	 */
-	public static String formatText2HTML(String info, String origin) {
+	public static String formatText2HTML(String origin) {
+		origin.replaceAll(" ", "&nbsp");
 		String[] res = origin.split("\n");
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("<ul>");
-		stringBuilder.append("<font color=\"#008800\">");
-		stringBuilder.append((info==null)?"自己":info);
-		stringBuilder.append(":</font>");
 		for(String s : res) {
 			stringBuilder.append("<li>");
 			stringBuilder.append(s);
 			stringBuilder.append("</li>");
 		}
+		return stringBuilder.toString();
+	}
+	public static String addUserInfo(String info, String s) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("<ul>");
+		stringBuilder.append("<font color=\"#008800\">");
+		stringBuilder.append((info==null)?"自己":info);
+		stringBuilder.append(":</font>");
+		stringBuilder.append(s);
+		stringBuilder.append("</ul>");
 		return stringBuilder.toString();
 	}
 	/**

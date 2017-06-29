@@ -55,10 +55,12 @@ public class Backstage implements BackstageInterface {
 	public void returnChoose(int whichWindow) {
 		// TODO Auto-generated method stub
 		if(whichWindow == Choose.CLIENT) {
+			System.out.println("CLIENT");
 			isServerMode = false;
 			LoginWindow._main(this);
 		}
 		if(whichWindow == Choose.SERVER) {
+			System.out.println("SERVER");
 			isServerMode = true;
 			tcpUtil = TcpUtil.getTcpUtilOfServer(serverPort, this);
 			serverWindow = ServerWindow._main(this);
@@ -98,33 +100,20 @@ public class Backstage implements BackstageInterface {
 		serverPort = -1;
 		sendUdpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.UDP.REQUEST_SERVER_ADDRESS_AND_PORT, ""));
 		/**
-		 * 超时控制代码，取自下面网站
-		 * http://blog.csdn.net/xmlrequest/article/details/8992029
+		 * 超时控制代码，我自己写的，网上的都是垃圾
 		 */
-		final ExecutorService exec = Executors.newFixedThreadPool(1);
-		Callable<String> call = new Callable<String>() {
-			@Override
-			public String call() throws Exception {
-				// TODO Auto-generated method stub
-				while(true) {
-					if(serverPort != -1) {
-						Thread.sleep(300);//降低循环频率
-						return null;
-					}
+		for(int i=0;i<10;i++) {
+			try {
+				Thread.sleep(300);
+				if(serverPort != -1) {
+					return true;
 				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		};
-		try {
-			Future<String> future = exec.submit(call);
-			future.get(1000 * 4, TimeUnit.MILLISECONDS);
-			return true;
-		} catch (TimeoutException ex) {
-            System.out.println("获取服务器地址和端口号超时啦....");
-            return false;
-        } catch (Exception e) {
-            System.out.println("获取失败.(未知原因)");
-            return false;
-        }
+		}
+		return false;
 	}
 	@Override
 	public void loadChatWindow(String nickname) {
@@ -138,11 +127,14 @@ public class Backstage implements BackstageInterface {
 		 * 分别是 '服务器接收客户端的获取请求' 和 '客户端接收服务器的反馈' ，
 		 * 所以只需要一个很简单的文本分割or正则匹配就OK。 */
 		Msg msg = MessageConstructor.parseMessage(receiveString);
+		System.out.println(receiveString);
 		if(isServerMode) {
 			if(msg.getCode() == MessageConstructor.Code.UDP.REQUEST_SERVER_ADDRESS_AND_PORT) {
 				String newMsg = serverAddress + ":" + serverPort;
 				sendUdpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.UDP.SERVER_ADDRESS_AND_PORT_FEEDBACK, newMsg));
 			}
+		}
+		else {
 			if(msg.getCode() == MessageConstructor.Code.UDP.SERVER_ADDRESS_AND_PORT_FEEDBACK) {
 				Msg tmp = MessageConstructor.parseIPAP(msg.getMessage());
 				serverAddress = tmp.getMessage();
@@ -173,6 +165,6 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public String getNickname() {
 		// TODO Auto-generated method stub
-		return null;
+		return nickname;
 	}
 }
