@@ -168,7 +168,7 @@ public class Backstage implements BackstageInterface {
 		if(isServerMode){
 			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER) {
 				String newMessage = HtmlUtil.addUserInfo(userInfo.toString(), msg.getMessage());
-				window.echoMessage(newMessage);
+				window.echoMessage(newMessage, null);
 				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, newMessage));
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_REQUEST) {
@@ -186,7 +186,7 @@ public class Backstage implements BackstageInterface {
 		}
 		else {
 			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT) {
-				window.echoMessage(msg.getMessage());
+				window.echoMessage(msg.getMessage(), null);
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_FEEDBACK) {
 				window.otherFunc(Boolean.parseBoolean(msg.getMessage()));
@@ -206,8 +206,13 @@ public class Backstage implements BackstageInterface {
 			else {
 				s = HtmlUtil.leave(nickname);
 			}
-			window.echoMessage(s);
+			window.echoMessage(s, null);
 			sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, s));
+		}
+		else if(!eol) {
+			/* 服务器下线 */
+			window.echoMessage(HtmlUtil.serverShutdown(), null);
+			window.otherFunc(false);
 		}
 	}
 	@Override

@@ -25,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
+import javax.swing.JCheckBox;
 
 public class ServerWindow implements WindowInterface {
 
@@ -36,6 +37,8 @@ public class ServerWindow implements WindowInterface {
 	private JTextArea textArea;
 	private BackstageInterface backstageInterface;
 	private Vector<Vector<String>> dataVec;
+	private JTextField txtAdminname;
+	private JCheckBox checkBox;
 
 	/**
 	 * Launch the application.
@@ -73,8 +76,9 @@ public class ServerWindow implements WindowInterface {
 	 */
 	private void initialize() {
 		frmServer = new JFrame();
+		frmServer.setResizable(false);
 		frmServer.setTitle("Server");
-		frmServer.setBounds(100, 100, 777, 479);
+		frmServer.setBounds(100, 100, 805, 479);
 		frmServer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		frmServer.getContentPane().setLayout(springLayout);
@@ -158,28 +162,28 @@ public class ServerWindow implements WindowInterface {
 			}
 			
 		});
-		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -6, SpringLayout.NORTH, textField);
 		
 		textArea = new JTextArea();
 		textArea.setEditable(false);
 		scrollPane_1.setViewportView(textArea);
-		springLayout.putConstraint(SpringLayout.WEST, textField, 10, SpringLayout.WEST, frmServer.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, textField, -10, SpringLayout.SOUTH, frmServer.getContentPane());
 		frmServer.getContentPane().add(textField);
 		textField.setColumns(10);
 		
 		btnSend = new JButton("Send");
+		springLayout.putConstraint(SpringLayout.EAST, textField, -6, SpringLayout.WEST, btnSend);
+		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -4, SpringLayout.NORTH, btnSend);
 		btnSend.setEnabled(false);
 		btnSend.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				String text = HtmlUtil.formatText2HTML(textField.getText());
-				String appendText = HtmlUtil.addSystemInfo("Admin", text);
+				String text = HtmlUtil.formatText2HTML(textField.getText(), checkBox.isSelected());
+				String appendText = HtmlUtil.addSystemInfo(txtAdminname.getText(), text);
 				System.out.println("appendText: "+appendText);
 				textField.setText(null);
 				textField.grabFocus();
-				echoMessage(appendText);
+				echoMessage(appendText, null);
 				String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, appendText);
 				backstageInterface.sendTcpMessage(msg);
 			}
@@ -187,13 +191,26 @@ public class ServerWindow implements WindowInterface {
 		});
 
 		springLayout.putConstraint(SpringLayout.SOUTH, btnSend, -10, SpringLayout.SOUTH, frmServer.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, textField, -6, SpringLayout.WEST, btnSend);
 		springLayout.putConstraint(SpringLayout.EAST, btnSend, 0, SpringLayout.EAST, scrollPane);
 		frmServer.getContentPane().add(btnSend);
+		
+		txtAdminname = new JTextField();
+		springLayout.putConstraint(SpringLayout.WEST, txtAdminname, 10, SpringLayout.WEST, frmServer.getContentPane());
+		springLayout.putConstraint(SpringLayout.SOUTH, txtAdminname, -10, SpringLayout.SOUTH, frmServer.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, txtAdminname, -695, SpringLayout.EAST, frmServer.getContentPane());
+		txtAdminname.setText("\u5446\u840C\u7684\u7BA1\u7406\u5458");
+		frmServer.getContentPane().add(txtAdminname);
+		txtAdminname.setColumns(10);
+		
+		checkBox = new JCheckBox("");
+		springLayout.putConstraint(SpringLayout.WEST, textField, 6, SpringLayout.EAST, checkBox);
+		springLayout.putConstraint(SpringLayout.SOUTH, checkBox, -10, SpringLayout.SOUTH, frmServer.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, checkBox, 6, SpringLayout.EAST, txtAdminname);
+		frmServer.getContentPane().add(checkBox);
 	}
 
 	@Override
-	public void echoMessage(String message) {
+	public void echoMessage(String message, String nickname) {
 		// TODO Auto-generated method stub
 		textArea.append(message + "\n");
 		textArea.setCaretPosition(textArea.getDocument().getLength());

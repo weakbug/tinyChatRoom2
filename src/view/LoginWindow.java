@@ -194,7 +194,7 @@ public class LoginWindow implements WindowInterface {
 	}
 
 	@Override
-	public void echoMessage(String message) {
+	public void echoMessage(String message, String nickname) {
 		// TODO Auto-generated method stub
 		
 	}

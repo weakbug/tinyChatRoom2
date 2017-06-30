@@ -9,8 +9,8 @@ public class HtmlUtil {
 	 * @param origin 原始文本。
 	 * @return 处理后的HTML文本。
 	 */
-	public static String formatText2HTML(String origin) {
-		String escaped = protect(origin);
+	public static String formatText2HTML(String origin, boolean isProtect) {
+		String escaped = isProtect?protect(origin):origin;
 		String[] res = escaped.split("\n");
 		StringBuilder stringBuilder = new StringBuilder();
 		for(String s : res) {
@@ -54,11 +54,15 @@ public class HtmlUtil {
 		return "<html><style type=\"text/css\"> ul{ margin: 4px; list-style-type:none; } div{ text-align:center; }</style><body></body></html>";
 	}
 	public static String welcome(String nickname) {
-		String s = "<div><font color=\"#880000\">欢迎 " + protect(nickname) + " 进入了聊天室。</font></div>";
+		String s = "<div><font color=\"#880000\">用户 " + protect(nickname) + " 进入了聊天室。</font></div>";
 		return s;
 	}
 	public static String leave(String nickname) {
 		String s = "<div><font color=\"#000088\">用户 " + protect(nickname) + " 离开了聊天室。</font></div>";
+		return s;
+	}
+	public static String serverShutdown() {
+		String s = "<div><font color=\"#000088\"><strong>注意：服务器已关闭。</strong></font></div>";
 		return s;
 	}
 	/**

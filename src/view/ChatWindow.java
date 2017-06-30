@@ -111,7 +111,7 @@ public class ChatWindow implements WindowInterface {
 		btnSend.setEnabled(false);
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String diaText = HtmlUtil.formatText2HTML(inputTextArea.getText());
+				String diaText = HtmlUtil.formatText2HTML(inputTextArea.getText(), true);
 				String appendText = HtmlUtil.addUserInfo(backstageInterface.getNickname(), diaText);
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
@@ -251,7 +251,7 @@ public class ChatWindow implements WindowInterface {
 		dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 	}
 	@Override
-	public void echoMessage(String message) {
+	public void echoMessage(String message, String nickname) {
 		// TODO Auto-generated method stub
 		System.out.println("echoMessage");
 		appendNewDia(message);
@@ -273,7 +273,8 @@ public class ChatWindow implements WindowInterface {
 	@Override
 	public void otherFunc(boolean b) {
 		// TODO Auto-generated method stub
-		
+		inputTextArea.setText("");
+		inputTextArea.setEnabled(b);
 	}
 
 	@Override
