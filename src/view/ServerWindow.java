@@ -240,7 +240,7 @@ public class ServerWindow implements WindowInterface {
 	}
 
 	@Override
-	public void addOrDeleteServerListItem(SocketInfo socketInfo, String nickname) {
+	public void addOrDeleteListItem(SocketInfo socketInfo, String nickname) {
 		// TODO Auto-generated method stub
 		if(socketInfo == null) {
 			System.out.println("Delete:" + nickname);

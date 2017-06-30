@@ -87,6 +87,7 @@ public class TcpUtil {
 		}
 		return tcpUtil;
 	}
+	/* 登录昵称重名判断 */
 	public boolean isContain(String nickname) {
 		SocketInfo tmpInfo = new SocketInfo(nickname);
 		if(socketinfolist.contains(tmpInfo)) {
@@ -94,25 +95,73 @@ public class TcpUtil {
 		}
 		return false;
 	}
+	private SocketInfo getSocketInfoByNickname(String nickname) {
+		SocketInfo tmpInfo = new SocketInfo(nickname);
+		int index = socketinfolist.indexOf(tmpInfo);
+		if(index != -1) {
+			return socketinfolist.get(index);
+		}
+		return null;
+	}
+	public void userBroadcast(final SocketInfo si) {
+		for(SocketInfo sx : socketinfolist) {
+			if(!sx.equals(si)) {
+				final String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.USER_ONLINE, sx.getNickname());
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						PrintWriter writer = null;
+						Socket s = si.getSocket();
+						try {
+							writer = new PrintWriter(s.getOutputStream());
+							writer.println(msg);
+							writer.flush();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}).start();
+			}
+		}
+	}
 	/**
 	 * 
 	 * @param msg 需要发送的消息
+	 * @param nickname 接收者昵称，null为全体
 	 */
-	public void sendMessage(final String msg) {		
-		new Thread(new Runnable() {
+	public void sendMessage(final String msg, final String nickname) {		
+		new Thread(new Runnable() { 
 			@Override
 			public void run() {
-				PrintWriter writer = null;
 				// TODO Auto-generated method stub
-				for(SocketInfo si : socketinfolist) {
-					Socket s = si.getSocket();
-					try {
-						writer = new PrintWriter(s.getOutputStream());
-						writer.println(msg);
-						writer.flush();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				PrintWriter writer = null;
+				if(nickname == null) {
+					for(SocketInfo si : socketinfolist) {
+						Socket s = si.getSocket();
+						try {
+							writer = new PrintWriter(s.getOutputStream());
+							writer.println(msg);
+							writer.flush();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				else {
+					SocketInfo socketInfo = getSocketInfoByNickname(nickname);
+					if(socketInfo != null) {
+						Socket s = socketInfo.getSocket();
+						try {
+							writer = new PrintWriter(s.getOutputStream());
+							writer.println(msg);
+							writer.flush();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -141,16 +190,6 @@ public class TcpUtil {
 			}
 		}).start();	
 	}
-	
-//	public SocketInfo searchSocket(String ipAddress,Integer port){
-//		int index;
-//		SocketInfo temp = new SocketInfo(ipAddress,port);
-//		index = socketinfolist.indexOf(temp);
-//		if(index != -1) {
-//			return socketinfolist.get(index);
-//		}
-//		return null;
-//	}
 	
 	public static class SocketInfo{
 		private String ipAddress;

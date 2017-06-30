@@ -213,7 +213,7 @@ public class LoginWindow implements WindowInterface {
 	}
 
 	@Override
-	public void addOrDeleteServerListItem(SocketInfo socketInfo, String nickname) {
+	public void addOrDeleteListItem(SocketInfo socketInfo, String nickname) {
 		// TODO Auto-generated method stub
 		
 	}

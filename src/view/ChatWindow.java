@@ -60,23 +60,14 @@ public class ChatWindow implements WindowInterface {
 	
 	class Render extends JLabel implements ListCellRenderer{
 		private Color color = Color.RED;
-		private int row = -1;
-		private int[] rows;
 		private List<String> redList = new ArrayList<String>();
 		public Render(){
 			
 		}
-		public Render(Color color, Integer i) {
-			// TODO Auto-generated constructor stub
-			this.color = color;
-			this.row = i;
-		}
-		public Render(Color color, int[] rows ){
-			this.color = color;
-			this.rows = rows;
-		}
 		public void addUserToRedList(String str){
-			redList.add(str);
+			if(!redList.contains(str)) {
+				redList.add(str);
+			}
 		}
 		public void deleteUserFromRedList(String str){
 			redList.remove(str);
@@ -93,8 +84,6 @@ public class ChatWindow implements WindowInterface {
 		            int index, boolean isSelected, boolean cellHasFocus) {   
 			setText(value.toString());
 			System.out.println(value.toString());
-			ListModel model;
-			model = list.getModel();
 			
 			if(isSelected){
 				setBackground(Color.GRAY);
@@ -115,31 +104,6 @@ public class ChatWindow implements WindowInterface {
 			setEnabled(list.isEnabled());  	          
 	          setOpaque(true);  
 			return this;
-			
-//			if(this.row != -1){
-//				if(index == this.row){
-//					setForeground(color);
-//					System.out.println("red");
-//				}else{
-//					setBackground(list.getBackground());  
-//		            setForeground(list.getForeground()); 
-//		            setFont(list.getFont());  		
-//				}
-//		 }else{
-//			  setBackground(list.getBackground());  
-//              setForeground(list.getForeground()); 
-//              setFont(list.getFont());
-//			 }
-//			 if (isSelected) {  
-//				 setBackground(Color.GRAY);
-//				 setForeground(Color.WHITE);
-//				 }
-//			if(this.row!= -1 && index == this.row && isSelected){
-//				row= -1;
-//			}
-//	          setEnabled(list.isEnabled());  	          
-//	          setOpaque(true);  		  
-//		      return this;  
 		    }  
 	}
 
@@ -214,7 +178,12 @@ public class ChatWindow implements WindowInterface {
 				String appendText = HtmlUtil.addUserInfo(backstageInterface.getNickname(), diaText);
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
-				String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER, diaText);
+				String msg;
+				msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER, diaText);
+				if(false) {
+					String umsg = MessageConstructor.constructPrivateMessage(diaText, "nickname");
+					msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_PRIVATE, umsg);
+				}
 				backstageInterface.sendTcpMessage(msg);
 			}
 		});
@@ -355,17 +324,17 @@ public class ChatWindow implements WindowInterface {
 		setChatRecord(html);
 		frmChatroom.getContentPane().add(btnSend);
 	}
-	private void appendNewDia(String appendText) {
+	private void appendNewDia(String appendText, String nickname) {
 		String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
 		dialogueTextPane.setText(allText);
-		setChatRecord(allText);
 		dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
+		
+		setChatRecord(allText);
 	}
 	@Override
 	public void echoMessage(String message, String nickname) {
 		// TODO Auto-generated method stub
-		System.out.println("echoMessage");
-		appendNewDia(message);
+		appendNewDia(message, nickname);
 	}
 
 	private String getChatRecord() {
@@ -392,9 +361,14 @@ public class ChatWindow implements WindowInterface {
 	}
 
 	@Override
-	public void addOrDeleteServerListItem(SocketInfo socketInfo, String nickname) {
+	public void addOrDeleteListItem(SocketInfo socketInfo, String nickname) {
 		// TODO Auto-generated method stub
-		
+		if(socketInfo != null) {
+			addToList(nickname);
+		}
+		else {
+			deleteFromList(nickname);
+		}
 	}
 	private int search(String str){
 		int index;
@@ -409,10 +383,10 @@ public class ChatWindow implements WindowInterface {
 		}
 	}
 
-	private void addToRedList(String str){
+	private void addToRedList(String str){ /* 待用标记 */
 		render.addUserToRedList(str);
 	}
-	private void deleteFromRedList(String str){
+	private void deleteFromRedList(String str){ /* 待用标记 */
 		render.deleteUserFromRedList(str);
 	}
 	private int searchInRedList(String str){
@@ -424,5 +398,8 @@ public class ChatWindow implements WindowInterface {
 		}else{
 			return false;
 		}
+	}
+	private void listUpdate() { /* 待用标记 */
+		list.setCellRenderer(render);
 	}
 }

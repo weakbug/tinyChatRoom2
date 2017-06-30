@@ -143,12 +143,12 @@ public class Backstage implements BackstageInterface {
 	@Override
 	public void sendTcpMessage(String message) {
 		// TODO Auto-generated method stub
-		tcpUtil.sendMessage(message);
+		tcpUtil.sendMessage(message, null);
 	}
 	@Override
 	public void sendTcpMessagePrivate(String message, String nickname) {
 		// TODO Auto-generated method stub
-		
+		tcpUtil.sendMessage(message, nickname);
 	}
 	@Override
 	public String getNickname() {
@@ -173,15 +173,22 @@ public class Backstage implements BackstageInterface {
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_REQUEST) {
 				String nickname = msg.getMessage();
-				boolean loginStatus = !tcpUtil.isContain(nickname);
-				System.out.println(loginStatus);
+				boolean loginStatus = !tcpUtil.isContain(nickname) && !nickname.contains("-");//ban '-' char,防止影响数据传输
 				if(loginStatus) {
 					/* 允许登录 */
 					userInfo.setNickname(nickname);
 					add2ServerList(userInfo);
 					someEnterOrLeave(nickname, true);
+					tcpUtil.userBroadcast(userInfo);
 				}
 				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.LOGIN_FEEDBACK, String.valueOf(loginStatus)));
+			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_PRIVATE) {
+				String ori = msg.getMessage();
+				String[] arr = MessageConstructor.parsePrivateMessage(ori);
+				String newMsg = HtmlUtil.addUserInfo(userInfo.toString(), arr[1]);
+				String umsg = MessageConstructor.constructPrivateMessage(newMsg, userInfo.getNickname());
+				sendTcpMessagePrivate(umsg, arr[0]);
 			}
 		}
 		else {
@@ -191,6 +198,17 @@ public class Backstage implements BackstageInterface {
 			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_FEEDBACK) {
 				window.otherFunc(Boolean.parseBoolean(msg.getMessage()));
 			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_PRIVATE) {
+				String ori = msg.getMessage();
+				String[] arr = MessageConstructor.parsePrivateMessage(ori);
+				window.echoMessage(arr[1], arr[0]);
+			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.USER_ONLINE) {
+				window.addOrDeleteListItem(new SocketInfo(""), msg.getMessage());
+			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.USER_OFFLINE) {
+				window.addOrDeleteListItem(null, msg.getMessage());
+			}
 		} 
 	}
 	@Override
@@ -198,15 +216,19 @@ public class Backstage implements BackstageInterface {
 		// TODO Auto-generated method stub
 		if(isServerMode) {
 			String s;
+			String msg;
 			/* 用户进入 */
 			if(eol) {
+				msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.USER_ONLINE, nickname);
 				s = HtmlUtil.welcome(nickname);
 			}
 			/* 用户离开 */
 			else {
+				msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.USER_OFFLINE, nickname);
 				s = HtmlUtil.leave(nickname);
 			}
 			window.echoMessage(s, null);
+			sendTcpMessage(msg);
 			sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, s));
 		}
 		else if(!eol) {
@@ -219,14 +241,14 @@ public class Backstage implements BackstageInterface {
 	public void add2ServerList(SocketInfo socketinfo) {
 		// TODO Auto-generated method stub
 		if(isServerMode) {
-			window.addOrDeleteServerListItem(socketinfo, null);
+			window.addOrDeleteListItem(socketinfo, null);
 		}
 	}
 	@Override
 	public void deleteFromServerList(String nickname) {
 		// TODO Auto-generated method stub
 		if(isServerMode) {
-			window.addOrDeleteServerListItem(null, nickname);
+			window.addOrDeleteListItem(null, nickname);
 		}
 	}
 }

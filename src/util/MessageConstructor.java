@@ -14,6 +14,9 @@ public class MessageConstructor {
 			public static final int MESSAGE_FROM_SERVER_TO_CLIENT = 1;
 			public static final int LOGIN_REQUEST = 3;
 			public static final int LOGIN_FEEDBACK = 4;
+			public static final int MESSAGE_PRIVATE = 5;
+			public static final int USER_ONLINE = 6;
+			public static final int USER_OFFLINE = 7;
 		}
 	}
 	public static class Msg {
@@ -57,6 +60,20 @@ public class MessageConstructor {
 		Matcher matcher = pattern.matcher(s);
 		if(matcher.find()) {
 			return new Msg(Integer.parseInt(matcher.group(2)), matcher.group(1));
+		}
+		return null;
+	}
+	public static String constructPrivateMessage(String message, String nickname) {
+		return nickname + "-" + message;
+	}
+	public static String[] parsePrivateMessage(String s) {
+		Pattern pattern = Pattern.compile("(.*)-(.*)");
+		Matcher matcher = pattern.matcher(s);
+		if(matcher.find()) {
+			String nickname = matcher.group(1);
+			String message = matcher.group(2);
+			String[] arr = new String[]{nickname, message};
+			return arr;
 		}
 		return null;
 	}
