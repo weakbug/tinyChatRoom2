@@ -1,9 +1,12 @@
 package view;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.Font;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -22,13 +25,18 @@ import util.TcpUtil.SocketInfo;
 
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SizeRequirements;
 import javax.swing.JList;
+import javax.swing.JPanel;
+
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -43,6 +51,53 @@ public class ChatWindow implements WindowInterface {
 	private JButton btnSend;
 	private String publicChatRecord;
 	private DefaultListModel listModel;
+	private JList list;
+	private Render render;
+	
+	class Render extends JLabel implements ListCellRenderer{
+		Color color;
+		int row = -1;
+		public Render(){
+			
+		}
+		public Render(Color color, int i) {
+			// TODO Auto-generated constructor stub
+			this.color = color;
+			this.row = i;
+		}
+
+		@Override
+		 public Component getListCellRendererComponent(JList list, Object value,  
+		            int index, boolean isSelected, boolean cellHasFocus) {   
+			setText(value.toString());
+			System.out.println(value.toString());
+			 if(this.row != -1){
+				 if(index == this.row){
+						setForeground(color);
+						System.out.println("red");
+					}else{
+						setBackground(list.getBackground());  
+			              setForeground(list.getForeground()); 
+			              setFont(list.getFont());  
+					}
+			 }else{
+				 setBackground(list.getBackground());  
+	              setForeground(list.getForeground()); 
+	              setFont(list.getFont());
+			 }
+			 if (isSelected) {  
+				 setBackground(Color.GRAY);
+				 setForeground(Color.WHITE);
+				 }
+			if(this.row!= -1 && index == this.row && isSelected){
+				row= -1;
+			}
+		          setEnabled(list.isEnabled());  	          
+		        setOpaque(true);  
+		  
+		        return this;  
+		    }  
+	}
 
 	/**
 	 * Launch the application.
@@ -175,11 +230,25 @@ public class ChatWindow implements WindowInterface {
 		});
 		springLayout.putConstraint(SpringLayout.SOUTH, btnSend, 0, SpringLayout.SOUTH, scrollPane);
 		
+		
 		listModel = new DefaultListModel();
 		listModel.addElement("所有人");
-		JList list = new JList(listModel);
+		addToList("fuck");
+		addToList("happy");
+		addToList("H");
+		list = new JList(listModel);
+		list.setCellRenderer(new Render());
+		list.setCellRenderer(new Render(Color.RED,3));
+		list.setCellRenderer(new Render(Color.RED,1));
+//		list.setCellRenderer((ListCellRenderer) render.getListCellRenderComponent(list, "", 1, true , true));
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(list);
+//		changeColor("所有人");
+		
+//		changeColor("H");
+//		changeColor("happy");
+//		backChangeColor("H");
+		
 		springLayout.putConstraint(SpringLayout.EAST, btnSend, 0, SpringLayout.EAST, scrollPane_1);
 		
 		dialogueTextPane = new JTextPane();
@@ -282,4 +351,10 @@ public class ChatWindow implements WindowInterface {
 		// TODO Auto-generated method stub
 		
 	}
+	private int search(String str){
+		int index;
+		index = listModel.indexOf(str);
+		return index;
+	}
+	
 }
