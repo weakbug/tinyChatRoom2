@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SizeRequirements;
 import javax.swing.JList;
@@ -40,6 +41,8 @@ import javax.swing.JPanel;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 public class ChatWindow implements WindowInterface {
@@ -54,16 +57,35 @@ public class ChatWindow implements WindowInterface {
 	private JList list;
 	private Render render;
 	
+	
 	class Render extends JLabel implements ListCellRenderer{
-		Color color;
-		int row = -1;
+		private Color color = Color.RED;
+		private int row = -1;
+		private int[] rows;
+		private List<String> redList = new ArrayList<String>();
 		public Render(){
 			
 		}
-		public Render(Color color, int i) {
+		public Render(Color color, Integer i) {
 			// TODO Auto-generated constructor stub
 			this.color = color;
 			this.row = i;
+		}
+		public Render(Color color, int[] rows ){
+			this.color = color;
+			this.rows = rows;
+		}
+		public void addUserToRedList(String str){
+			redList.add(str);
+		}
+		public void deleteUserFromRedList(String str){
+			redList.remove(str);
+		}
+		public void refreshListModel(){
+			
+		}
+		public int  serachUserInRedList(String str){
+			return redList.indexOf(str);
 		}
 
 		@Override
@@ -71,31 +93,53 @@ public class ChatWindow implements WindowInterface {
 		            int index, boolean isSelected, boolean cellHasFocus) {   
 			setText(value.toString());
 			System.out.println(value.toString());
-			 if(this.row != -1){
-				 if(index == this.row){
-						setForeground(color);
-						System.out.println("red");
-					}else{
-						setBackground(list.getBackground());  
-			              setForeground(list.getForeground()); 
-			              setFont(list.getFont());  
-					}
-			 }else{
-				 setBackground(list.getBackground());  
-	              setForeground(list.getForeground()); 
-	              setFont(list.getFont());
-			 }
-			 if (isSelected) {  
-				 setBackground(Color.GRAY);
+			ListModel model;
+			model = list.getModel();
+			
+			if(isSelected){
+				setBackground(Color.GRAY);
 				 setForeground(Color.WHITE);
+				 if(isInList(value.toString())){
+					 deleteUserFromRedList(value.toString());
 				 }
-			if(this.row!= -1 && index == this.row && isSelected){
-				row= -1;
+			}else{
+				setBackground(list.getBackground());  
+	            setForeground(list.getForeground()); 
+	            setFont(list.getFont());  	
 			}
-		          setEnabled(list.isEnabled());  	          
-		        setOpaque(true);  
-		  
-		        return this;  
+			for(String str:redList){
+				if(index == search(str)){
+					setForeground(color);
+					}
+				}
+			setEnabled(list.isEnabled());  	          
+	          setOpaque(true);  
+			return this;
+			
+//			if(this.row != -1){
+//				if(index == this.row){
+//					setForeground(color);
+//					System.out.println("red");
+//				}else{
+//					setBackground(list.getBackground());  
+//		            setForeground(list.getForeground()); 
+//		            setFont(list.getFont());  		
+//				}
+//		 }else{
+//			  setBackground(list.getBackground());  
+//              setForeground(list.getForeground()); 
+//              setFont(list.getFont());
+//			 }
+//			 if (isSelected) {  
+//				 setBackground(Color.GRAY);
+//				 setForeground(Color.WHITE);
+//				 }
+//			if(this.row!= -1 && index == this.row && isSelected){
+//				row= -1;
+//			}
+//	          setEnabled(list.isEnabled());  	          
+//	          setOpaque(true);  		  
+//		      return this;  
 		    }  
 	}
 
@@ -231,23 +275,21 @@ public class ChatWindow implements WindowInterface {
 		springLayout.putConstraint(SpringLayout.SOUTH, btnSend, 0, SpringLayout.SOUTH, scrollPane);
 		
 		
+		render = new Render();
 		listModel = new DefaultListModel();
 		listModel.addElement("所有人");
-		addToList("fuck");
-		addToList("happy");
-		addToList("H");
+//		addToList("fuck");
+//		addToList("happy");
+//		addToList("H");
 		list = new JList(listModel);
-		list.setCellRenderer(new Render());
-		list.setCellRenderer(new Render(Color.RED,3));
-		list.setCellRenderer(new Render(Color.RED,1));
-//		list.setCellRenderer((ListCellRenderer) render.getListCellRenderComponent(list, "", 1, true , true));
+		list.setCellRenderer(render);
+//		addToRedList("H");
+//		addToRedList("fuck");
+//		listModel.remove(0);
+//		deleteFromRedList("H");
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(list);
-//		changeColor("所有人");
-		
-//		changeColor("H");
-//		changeColor("happy");
-//		backChangeColor("H");
+
 		
 		springLayout.putConstraint(SpringLayout.EAST, btnSend, 0, SpringLayout.EAST, scrollPane_1);
 		
@@ -336,7 +378,10 @@ public class ChatWindow implements WindowInterface {
 		listModel.addElement(str);
 	}
 	private void deleteFromList(String str){
-		listModel.removeElement(str);
+		listModel.remove(search(str));
+		if(isInRedList(str)){
+			deleteFromRedList(str);
+		}
 	}
 
 	@Override
@@ -355,5 +400,29 @@ public class ChatWindow implements WindowInterface {
 		int index;
 		index = listModel.indexOf(str);
 		return index;
+	}
+	private boolean isInList(String str){
+		if(listModel.indexOf(str)!=-1){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	private void addToRedList(String str){
+		render.addUserToRedList(str);
+	}
+	private void deleteFromRedList(String str){
+		render.deleteUserFromRedList(str);
+	}
+	private int searchInRedList(String str){
+		return render.serachUserInRedList(str);
+	}
+	private boolean isInRedList(String str){
+		if(searchInRedList(str)!=-1){
+			return true;
+		}else{
+			return false;
+		}
 	}
 }
