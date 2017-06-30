@@ -356,5 +356,13 @@ public class ChatWindow implements WindowInterface {
 		index = listModel.indexOf(str);
 		return index;
 	}
+<<<<<<< HEAD
+=======
+	private int search(String str){
+		int index;
+		index = listModel.indexOf(str);
+		return index;
+	}
+>>>>>>> 672757f93269b12d72e8f1e3014846ab905b1a02
 	
 }
