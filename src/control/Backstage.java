@@ -177,7 +177,7 @@ public class Backstage implements BackstageInterface {
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_REQUEST) {
 				String nickname = msg.getMessage();
-				boolean loginStatus = !tcpUtil.isContain(nickname) && !nickname.contains("-");//ban '-' char,防止影响数据传输
+				boolean loginStatus = !tcpUtil.isContain(nickname) && !nickname.contains("-") && !nickname.equals("所有人");//ban '-'/"所有人" ,防止影响数据传输
 				if(loginStatus) {
 					/* 允许登录 */
 					userInfo.setNickname(nickname);
@@ -190,8 +190,10 @@ public class Backstage implements BackstageInterface {
 				String ori = msg.getMessage();
 				String[] arr = MessageConstructor.parsePrivateMessage(ori);
 				String newMsg = HtmlUtil.addUserInfo(userInfo.toString(), arr[1]);
-				String umsg = MessageConstructor.constructPrivateMessage(newMsg, userInfo.getNickname());
-				String umsg2 = MessageConstructor.constructPrivateMessage(newMsg, arr[0]);
+				String umsg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_PRIVATE, 
+						MessageConstructor.constructPrivateMessage(newMsg, userInfo.getNickname()));
+				String umsg2 = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_PRIVATE, 
+						MessageConstructor.constructPrivateMessage(newMsg, arr[0]));
 				sendTcpMessagePrivate(umsg, arr[0]); /* 投递私聊信息至目的地 */
 				sendTcpMessagePrivate(umsg2, userInfo); /* 回显私聊信息至发送端 */
 			}

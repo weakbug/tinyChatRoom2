@@ -17,7 +17,7 @@ import util.TcpUtil.SocketInfo;
 
 public class TcpUtil {
 	private static TcpUtil tcpUtil;
-	private static List<SocketInfo> socketinfolist = new ArrayList<SocketInfo>();
+	private List<SocketInfo> socketinfolist = new ArrayList<SocketInfo>();
 	private BackstageInterface backstageInterface;
 	/**
 	 * 服务端用的构造器
@@ -97,7 +97,7 @@ public class TcpUtil {
 		}
 		return false;
 	}
-	public static SocketInfo getSocketInfoByNickname(String nickname) {
+	public SocketInfo getSocketInfoByNickname(String nickname) {
 		SocketInfo tmpInfo = new SocketInfo(nickname);
 		int index = socketinfolist.indexOf(tmpInfo);
 		if(index != -1) {
@@ -241,7 +241,6 @@ public class TcpUtil {
 		private Integer port;
 		private Socket socket;
 		private String nickname;
-		private String chatRecord;
 		
 		private SocketInfo(String address,int port){
 			ipAddress = address;
@@ -274,15 +273,6 @@ public class TcpUtil {
 		public String getNickname() {
 			return nickname;
 		}
-		public void setChatRecord(String chatRecord) {
-			this.chatRecord = chatRecord;
-		}
-		public String getChatRecord() {
-			if(chatRecord == null) {
-				chatRecord = HtmlUtil.getBase();
-			}
-			return chatRecord;
-		}
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
@@ -301,9 +291,6 @@ public class TcpUtil {
 			}
 			if(anObject instanceof SocketInfo) {
 				SocketInfo si = (SocketInfo)anObject;
-//				if(this.ipAddress.equals(si.ipAddress) && this.port == si.port) {
-//					return true;
-//				}
 				if(this.nickname.equals(si.nickname)) {
 					return true;
 				}

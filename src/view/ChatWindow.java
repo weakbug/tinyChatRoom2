@@ -43,6 +43,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -55,7 +56,7 @@ public class ChatWindow implements WindowInterface {
 	private JTextArea inputTextArea;
 	private JTextPane dialogueTextPane;
 	private JButton btnSend;
-	private String publicChatRecord;
+	private HashMap<String, String> chatRecord = new HashMap<String, String>();
 	private DefaultListModel listModel;
 	private JList list;
 	private Render render;
@@ -318,46 +319,34 @@ public class ChatWindow implements WindowInterface {
 	        }); 
 		dialogueTextPane.setContentType("text/html");
 		scrollPane_1.setViewportView(dialogueTextPane);
-		String html = HtmlUtil.getBase();
-		dialogueTextPane.setText(html);
-		setChatRecord(html);
+		dialogueTextPane.setText(getChatRecord((String)list.getSelectedValue()));
 		frmChatroom.getContentPane().add(btnSend);
 		
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
 				String select = (String)list.getSelectedValue();
 				deleteFromRedList(select);
-				if(select.equals("所有人")) {
-					dialogueTextPane.setText(getChatRecord());
-					dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
-				}
-				else {
-					dialogueTextPane.setText(TcpUtil.getSocketInfoByNickname(select).getChatRecord());
-					dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
-				}
+				dialogueTextPane.setText(getChatRecord((String)list.getSelectedValue()));
+				dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 			}
 		});
 	}
 	private void appendNewDia(String appendText, String nickname) {
+		if(nickname == null) {
+			nickname = "所有人";
+		}
+		System.out.println("ts: " + nickname + appendText);
 		String allText;
-		if(nickname == null) { //公聊记录
-			allText = HtmlUtil.append(getChatRecord(), appendText);
-			setChatRecord(allText);
-		}
-		else { //私聊记录
-			allText = HtmlUtil.append(TcpUtil.getSocketInfoByNickname(nickname).getChatRecord(), appendText);
-			TcpUtil.getSocketInfoByNickname(nickname).setChatRecord(allText);
-		}
-		if(nickname == null && ((String)list.getSelectedValue()).equals("所有人")) {
-			dialogueTextPane.setText(allText);
-			dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
-		}
-		else if(nickname.equals((String)list.getSelectedValue())) {
+		
+		allText = HtmlUtil.append(getChatRecord(nickname), appendText);
+		setChatRecord(allText, nickname);
+		
+		if(((String)list.getSelectedValue()).equals(nickname)) {
 			dialogueTextPane.setText(allText);
 			dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
 		}
 		else {
-			addToRedList(nickname==null?"所有人":nickname);
+			addToRedList(nickname);
 		}
 	}
 	@Override
@@ -366,15 +355,6 @@ public class ChatWindow implements WindowInterface {
 		appendNewDia(message, nickname);
 	}
 
-	private String getChatRecord() {
-		if(publicChatRecord == null) {
-			publicChatRecord = HtmlUtil.getBase();
-		}
-		return publicChatRecord;
-	}
-	private void setChatRecord(String chatRecord) {
-		publicChatRecord = chatRecord;
-	}
 	private void addToList(String str){
 		listModel.addElement(str);
 	}
@@ -399,7 +379,11 @@ public class ChatWindow implements WindowInterface {
 			addToList(nickname);
 		}
 		else {
+			if(((String)list.getSelectedValue()).equals(nickname)) {
+				list.setSelectedIndex(0);
+			}
 			deleteFromList(nickname);
+			deleteChatRecord(nickname);
 		}
 	}
 	private int search(String str){
@@ -417,11 +401,11 @@ public class ChatWindow implements WindowInterface {
 
 	private void addToRedList(String str){ /* 待用标记 */
 		render.addUserToRedList(str);
-		list.setCellRenderer(render);
+		list.updateUI();
 	}
 	private void deleteFromRedList(String str){ /* 待用标记 */
 		render.deleteUserFromRedList(str);
-		list.setCellRenderer(render);
+		list.updateUI();
 	}
 	private int searchInRedList(String str){
 		return render.serachUserInRedList(str);
@@ -435,5 +419,19 @@ public class ChatWindow implements WindowInterface {
 	}
 	private void listUpdate() { /* 待用标记 */
 		list.setCellRenderer(render);
+	}
+	private String getChatRecord(String nickname) {
+		String oneChatRecord = chatRecord.get(nickname);
+		if(oneChatRecord == null) {
+			oneChatRecord = HtmlUtil.getBase();
+			chatRecord.put(nickname, oneChatRecord);
+		}
+		return oneChatRecord;
+	}
+	private void setChatRecord(String oneChatRecord, String nickname) {
+		chatRecord.put(nickname, oneChatRecord);
+	}
+	private void deleteChatRecord(String nickname) {
+		chatRecord.remove(nickname);
 	}
 }
