@@ -83,7 +83,7 @@ public class ChatWindow implements WindowInterface {
 		 public Component getListCellRendererComponent(JList list, Object value,  
 		            int index, boolean isSelected, boolean cellHasFocus) {   
 			setText(value.toString());
-			System.out.println(value.toString());
+//			System.out.println(value.toString());
 			
 			if(isSelected){
 				setBackground(Color.GRAY);
@@ -247,15 +247,8 @@ public class ChatWindow implements WindowInterface {
 		render = new Render();
 		listModel = new DefaultListModel();
 		listModel.addElement("À˘”–»À");
-//		addToList("fuck");
-//		addToList("happy");
-//		addToList("H");
 		list = new JList(listModel);
 		list.setCellRenderer(render);
-//		addToRedList("H");
-//		addToRedList("fuck");
-//		listModel.remove(0);
-//		deleteFromRedList("H");
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(list);
 

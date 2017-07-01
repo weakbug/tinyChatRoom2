@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import control.BackstageInterface;
+import util.MessageConstructor.Msg;
+import util.TcpUtil.SocketInfo;
 
 public class TcpUtil {
 	private static TcpUtil tcpUtil;
@@ -104,14 +106,39 @@ public class TcpUtil {
 		return null;
 	}
 	public void userBroadcast(final SocketInfo si) {
+		Msg all = new Msg(0, null);
 		for(SocketInfo sx : socketinfolist) {
 			if(!sx.equals(si)) {
-				final String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.USER_ONLINE, sx.getNickname());
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						PrintWriter writer = null;
+				all = MessageConstructor.constructCurrentUserMsg(sx.getNickname(), all);
+			}
+		}
+		final String msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.CURRRENT_USER_FEEDBACK, all.getCode() + "-" + all.getMessage());
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				PrintWriter writer = null;
+				Socket s = si.getSocket();
+				try {
+					writer = new PrintWriter(s.getOutputStream());
+					writer.println(msg);
+					writer.flush();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
+	/* 向除去自己外的其他人发送消息 */
+	public void sendMessageNoSelf(final String msg, final String nickname) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				PrintWriter writer = null;
+				for(SocketInfo si : socketinfolist) {
+					if(!si.getNickname().equals(nickname)) {
 						Socket s = si.getSocket();
 						try {
 							writer = new PrintWriter(s.getOutputStream());
@@ -122,16 +149,34 @@ public class TcpUtil {
 							e.printStackTrace();
 						}
 					}
-				}).start();
+				}
 			}
-		}
+		}).start();
+	}
+	public void sendMessage2(final String msg, final SocketInfo userInfo) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				PrintWriter writer = null;
+				Socket s = userInfo.getSocket();
+				try {
+					writer = new PrintWriter(s.getOutputStream());
+					writer.println(msg);
+					writer.flush();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 	/**
 	 * 
 	 * @param msg 需要发送的消息
 	 * @param nickname 接收者昵称，null为全体
 	 */
-	public void sendMessage(final String msg, final String nickname) {		
+	public void sendMessage(final String msg, final String nickname) {
 		new Thread(new Runnable() { 
 			@Override
 			public void run() {
@@ -180,9 +225,9 @@ public class TcpUtil {
 				}
 			} catch (IOException e) {
 				System.out.println(socketInfo.getInfo() + " disconnected..");
+				socketinfolist.remove(socketInfo);
 				backstageInterface.someEnterOrLeave(socketInfo.getNickname(), false);
 				backstageInterface.deleteFromServerList(socketInfo.getNickname());
-				socketinfolist.remove(socketInfo);
 				System.out.println(socketinfolist.size() + " person(s) in chatroom now.");
 				// TODO Auto-generated catch block
 				e.printStackTrace();

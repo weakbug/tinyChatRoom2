@@ -150,6 +150,10 @@ public class Backstage implements BackstageInterface {
 		// TODO Auto-generated method stub
 		tcpUtil.sendMessage(message, nickname);
 	}
+	private void sendTcpMessagePrivate(String message, SocketInfo userInfo) {
+		// TODO Auto-generated method stub
+		tcpUtil.sendMessage2(message, userInfo);
+	}
 	@Override
 	public String getNickname() {
 		// TODO Auto-generated method stub
@@ -179,9 +183,8 @@ public class Backstage implements BackstageInterface {
 					userInfo.setNickname(nickname);
 					add2ServerList(userInfo);
 					someEnterOrLeave(nickname, true);
-					tcpUtil.userBroadcast(userInfo);
 				}
-				sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.LOGIN_FEEDBACK, String.valueOf(loginStatus)));
+				sendTcpMessagePrivate(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.LOGIN_FEEDBACK, String.valueOf(loginStatus)), userInfo);
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_PRIVATE) {
 				String ori = msg.getMessage();
@@ -190,13 +193,23 @@ public class Backstage implements BackstageInterface {
 				String umsg = MessageConstructor.constructPrivateMessage(newMsg, userInfo.getNickname());
 				sendTcpMessagePrivate(umsg, arr[0]);
 			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.CURRENT_USER_REQUEST) {
+				tcpUtil.userBroadcast(userInfo);
+			}
 		}
 		else {
+			SocketInfo fakeBooleanTure = new SocketInfo("");
+			SocketInfo fakeBooleanFalse = null;
 			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT) {
 				window.echoMessage(msg.getMessage(), null);
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.LOGIN_FEEDBACK) {
-				window.otherFunc(Boolean.parseBoolean(msg.getMessage()));
+				boolean status = Boolean.parseBoolean(msg.getMessage());
+				window.otherFunc(status);
+				if(status == true) {
+					//获取当前用户请求
+					sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.CURRENT_USER_REQUEST, ""));
+				}
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.MESSAGE_PRIVATE) {
 				String ori = msg.getMessage();
@@ -204,10 +217,16 @@ public class Backstage implements BackstageInterface {
 				window.echoMessage(arr[1], arr[0]);
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.USER_ONLINE) {
-				window.addOrDeleteListItem(new SocketInfo(""), msg.getMessage());
+				window.addOrDeleteListItem(fakeBooleanTure, msg.getMessage());
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.USER_OFFLINE) {
-				window.addOrDeleteListItem(null, msg.getMessage());
+				window.addOrDeleteListItem(fakeBooleanFalse, msg.getMessage());
+			}
+			if(msg.getCode() == MessageConstructor.Code.TCP.CURRRENT_USER_FEEDBACK) {
+				List<String> nicknameSet = MessageConstructor.parseCurrentUserMsg(msg.getMessage());
+				for(String s : nicknameSet) {
+					window.addOrDeleteListItem(fakeBooleanTure, s);
+				}
 			}
 		} 
 	}
@@ -228,7 +247,7 @@ public class Backstage implements BackstageInterface {
 				s = HtmlUtil.leave(nickname);
 			}
 			window.echoMessage(s, null);
-			sendTcpMessage(msg);
+			tcpUtil.sendMessageNoSelf(msg, nickname);
 			sendTcpMessage(MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_SERVER_TO_CLIENT, s));
 		}
 		else if(!eol) {
