@@ -21,6 +21,7 @@ import control.BackstageInterface;
 import control.WindowInterface;
 import util.HtmlUtil;
 import util.MessageConstructor;
+import util.TcpUtil;
 import util.TcpUtil.SocketInfo;
 
 import javax.swing.SpringLayout;
@@ -44,6 +45,8 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 
 public class ChatWindow implements WindowInterface {
 
@@ -179,9 +182,10 @@ public class ChatWindow implements WindowInterface {
 				inputTextArea.setText(null);
 				inputTextArea.grabFocus();
 				String msg;
-				msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER, diaText);
-				if(false) {
-					String umsg = MessageConstructor.constructPrivateMessage(diaText, "nickname");
+				if(list.getSelectedIndex() == 0)
+					msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_FROM_CLIENT_TO_SERVER, diaText);
+				else {
+					String umsg = MessageConstructor.constructPrivateMessage(diaText, (String)list.getSelectedValue());
 					msg = MessageConstructor.constructMessage(MessageConstructor.Code.TCP.MESSAGE_PRIVATE, umsg);
 				}
 				backstageInterface.sendTcpMessage(msg);
@@ -248,6 +252,8 @@ public class ChatWindow implements WindowInterface {
 		listModel = new DefaultListModel();
 		listModel.addElement("所有人");
 		list = new JList(listModel);
+
+		list.setSelectedIndex(0);
 		list.setCellRenderer(render);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(list);
@@ -316,13 +322,43 @@ public class ChatWindow implements WindowInterface {
 		dialogueTextPane.setText(html);
 		setChatRecord(html);
 		frmChatroom.getContentPane().add(btnSend);
+		
+		list.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				String select = (String)list.getSelectedValue();
+				deleteFromRedList(select);
+				if(select.equals("所有人")) {
+					dialogueTextPane.setText(getChatRecord());
+					dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
+				}
+				else {
+					dialogueTextPane.setText(TcpUtil.getSocketInfoByNickname(select).getChatRecord());
+					dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
+				}
+			}
+		});
 	}
 	private void appendNewDia(String appendText, String nickname) {
-		String allText = HtmlUtil.append(dialogueTextPane.getText(), appendText);
-		dialogueTextPane.setText(allText);
-		dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
-		
-		setChatRecord(allText);
+		String allText;
+		if(nickname == null) { //公聊记录
+			allText = HtmlUtil.append(getChatRecord(), appendText);
+			setChatRecord(allText);
+		}
+		else { //私聊记录
+			allText = HtmlUtil.append(TcpUtil.getSocketInfoByNickname(nickname).getChatRecord(), appendText);
+			TcpUtil.getSocketInfoByNickname(nickname).setChatRecord(allText);
+		}
+		if(nickname == null && ((String)list.getSelectedValue()).equals("所有人")) {
+			dialogueTextPane.setText(allText);
+			dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
+		}
+		else if(nickname.equals((String)list.getSelectedValue())) {
+			dialogueTextPane.setText(allText);
+			dialogueTextPane.setCaretPosition(dialogueTextPane.getDocument().getLength());
+		}
+		else {
+			addToRedList(nickname==null?"所有人":nickname);
+		}
 	}
 	@Override
 	public void echoMessage(String message, String nickname) {
@@ -331,6 +367,9 @@ public class ChatWindow implements WindowInterface {
 	}
 
 	private String getChatRecord() {
+		if(publicChatRecord == null) {
+			publicChatRecord = HtmlUtil.getBase();
+		}
 		return publicChatRecord;
 	}
 	private void setChatRecord(String chatRecord) {
@@ -378,15 +417,17 @@ public class ChatWindow implements WindowInterface {
 
 	private void addToRedList(String str){ /* 待用标记 */
 		render.addUserToRedList(str);
+		list.setCellRenderer(render);
 	}
 	private void deleteFromRedList(String str){ /* 待用标记 */
 		render.deleteUserFromRedList(str);
+		list.setCellRenderer(render);
 	}
 	private int searchInRedList(String str){
 		return render.serachUserInRedList(str);
 	}
 	private boolean isInRedList(String str){
-		if(searchInRedList(str)!=-1){
+		if(searchInRedList(str)!=-1) {
 			return true;
 		}else{
 			return false;

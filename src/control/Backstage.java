@@ -191,7 +191,9 @@ public class Backstage implements BackstageInterface {
 				String[] arr = MessageConstructor.parsePrivateMessage(ori);
 				String newMsg = HtmlUtil.addUserInfo(userInfo.toString(), arr[1]);
 				String umsg = MessageConstructor.constructPrivateMessage(newMsg, userInfo.getNickname());
-				sendTcpMessagePrivate(umsg, arr[0]);
+				String umsg2 = MessageConstructor.constructPrivateMessage(newMsg, arr[0]);
+				sendTcpMessagePrivate(umsg, arr[0]); /* 投递私聊信息至目的地 */
+				sendTcpMessagePrivate(umsg2, userInfo); /* 回显私聊信息至发送端 */
 			}
 			if(msg.getCode() == MessageConstructor.Code.TCP.CURRENT_USER_REQUEST) {
 				tcpUtil.userBroadcast(userInfo);
